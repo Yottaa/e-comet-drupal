@@ -1,0 +1,45 @@
+<project name="yottaa.drupal" default="dev">
+	
+    <property file="custom-build.properties"/>
+
+	<property file="build.properties"/>
+
+	<property name="yottaa.module.id" value="yottaa"/>
+	<property name="yottaa.module.title" value="Yottaa Drupal Integration" />
+	
+	<property name="drupal.module.id" value="yottaa-7.x-1.0"/>
+	<property name="drupal.module.title" value="Drupal Module for Yottaa Integration" />
+
+	<property name="project.dir" value="."/>
+
+	<property name="yottaa.dir" value="${project.dir}/yottaa"/>
+	<property name="drupal.dir"   value="${project.dir}/modules"/>
+
+	<property name="drupal.module.yottaa.dir"   value="${drupal.dir}/yottaa"/>
+
+	<property name="build.dir" value="${project.dir}/build"/>
+
+	<property name="drupal.module.package.file.tar.gz" value="${build.dir}/${drupal.module.id}.tar.gz" />
+
+	<target name="clean">
+		<delete>
+			<fileset dir="${build.dir}" includes="**/*"/>
+  		</delete>
+	</target>
+
+	<target name="package-drupal-module" description="Packages Drupal module">
+		<echo>Packaging ${drupal.module.title} Module file</echo>
+		<tar destfile="${drupal.module.package.file.tar.gz}" compression="gzip">
+		  <tarfileset dir="${drupal.dir}/yottaa" prefix="yottaa"/>
+		</tar>	
+	</target>
+
+	<target name="package" depends="package-drupal-module" />
+
+	<target name="dev">
+		<copy todir="${drupal.location}/sites/all/modules" verbose="true">
+			<fileset dir="${drupal.dir}" />
+		</copy>		
+	</target>
+   
+</project>
