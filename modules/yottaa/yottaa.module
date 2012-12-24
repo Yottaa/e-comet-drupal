@@ -1,0 +1,367 @@
+<?php
+/**
+ * Yottaa Module
+ *
+ * @author Yong Qu
+ *
+ * This version includes following features
+ *
+ *
+ */
+
+/**
+ * Implementation of hook_init() for Yottaa module.
+ *
+ */
+function yottaa_init()
+{
+    // Include Yottaa utility functions.
+    module_load_include('inc', 'yottaa', 'yottaa.utils');
+}
+
+/**
+ * Implementation of hook_menu() for Yottaa module.
+ * Add Yottaa setting link to admin menu.
+ */
+function yottaa_menu()
+{
+
+    $items = array();
+
+
+    $yottaa_user_id = variable_get('yottaa_user_id', '');
+    $yottaa_api_key = variable_get('yottaa_api_key', '');
+    $yottaa_site_id = variable_get('yottaa_site_id', '');
+
+
+    if ($yottaa_user_id == '' || $yottaa_api_key == '' || $yottaa_site_id == '') {
+
+        $items['admin/settings/yottaa'] = array(
+            'title' => 'Yottaa Settings',
+            'page callback' => 'drupal_get_form',
+            'page arguments' => array('yottaa_new_account'),
+            'access callback' => 'user_access',
+            'access arguments' => array('administer yottaa'),
+            'type' => MENU_NORMAL_ITEM,
+            'weight' => 1
+        );
+
+        $items['admin/settings/yottaa/new_user'] = array(
+            'title' => 'New Yottaa Account',
+            'page callback' => 'drupal_get_form',
+            'page arguments' => array('yottaa_new_account'),
+            'access callback' => 'user_access',
+            'access arguments' => array('administer yottaa'),
+            'type' => MENU_DEFAULT_LOCAL_TASK,
+            'weight' => 2
+        );
+
+        $items['admin/settings/yottaa/existing_user'] = array(
+            'title' => 'Existing Yottaa Account',
+            'page callback' => 'drupal_get_form',
+            'page arguments' => array('yottaa_admin_settings'),
+            'access callback' => 'user_access',
+            'access arguments' => array('administer yottaa'),
+            'type' => MENU_LOCAL_TASK,
+            'weight' => 3
+        );
+
+    } else {
+        $items['admin/settings/yottaa'] = array(
+            'title' => 'Yottaa Settings',
+            'page callback' => 'yottaa_info',
+            'access callback' => 'user_access',
+            'access arguments' => array('administer yottaa'),
+            'type' => MENU_NORMAL_ITEM,
+            'weight' => 1
+        );
+
+        $items['admin/settings/yottaa/info'] = array(
+            'title' => 'Yottaa Info',
+            'page callback' => 'yottaa_info',
+            'access callback' => 'user_access',
+            'access arguments' => array('administer yottaa'),
+            'type' => MENU_DEFAULT_LOCAL_TASK,
+            'weight' => 2
+        );
+
+        $items['admin/settings/yottaa/existing_user'] = array(
+            'title' => 'Existing Yottaa Account',
+            'page callback' => 'drupal_get_form',
+            'page arguments' => array('yottaa_admin_settings'),
+            'access callback' => 'user_access',
+            'access arguments' => array('administer yottaa'),
+            'type' => MENU_LOCAL_TASK,
+            'weight' => 3
+        );
+
+    }
+
+    return $items;
+}
+
+/**
+ * Prepare and generate entry form for new Yottaa account.
+ */
+function yottaa_new_account()
+{
+    global $user;
+
+    $form['yottaa_new_account'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('New Yottaa Account'),
+        '#description' => t('Registers for a new Yottaa account.'),
+        '#collapsible' => FALSE,
+        '#collapsed' => FALSE,
+    );
+
+    $form['yottaa_new_account']['yottaa_user_name'] = array(
+        '#type' => 'textfield',
+        '#title' => t('User Name'),
+        '#description' => t('Enter the full user name for your new Yottaa account.'),
+        '#default_value' => isset($_GET['yottaa_user_name']) ? $_GET['yottaa_user_name'] : $user->name,
+    );
+
+    $form['yottaa_new_account']['yottaa_user_phone'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Phone'),
+        '#description' => t('Enter the phone number for your new Yottaa account.'),
+        '#default_value' => isset($_GET['yottaa_user_phone']) ? $_GET['yottaa_user_phone'] : '',
+    );
+
+    $form['yottaa_new_account']['yottaa_user_email'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Email'),
+        '#description' => t('Enter the email for your new Yottaa account.'),
+        '#default_value' => isset($_GET['yottaa_user_email']) ? $_GET['yottaa_user_email'] : $user->mail,
+    );
+
+    $form['yottaa_new_account']['yottaa_site_name'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Site Name'),
+        '#description' => t('Enter the site name for your new Yottaa account.'),
+        '#default_value' => isset($_GET['yottaa_site_name']) ? $_GET['yottaa_site_name'] : $_SERVER['SERVER_NAME'],
+    );
+
+    $form['yottaa_new_account']['submit'] = array(
+        '#type' => 'submit',
+        '#name' => 'create',
+        '#default_value' => 'Create Account',
+    );
+
+    return $form;
+}
+
+/**
+ * Handle Yottaa New Account Submission.
+ */
+function yottaa_new_account_submit($form, &$form_state)
+{
+    drupal_set_message(t('New account form has been submitted.'));
+    $user_name = $form_state['values']['yottaa_user_name'];
+    $user_phone = $form_state['values']['yottaa_user_phone'];
+    $user_email = $form_state['values']['yottaa_user_email'];
+    $site_name = $form_state['values']['yottaa_site_name'];
+
+    $json_output = create_yottaa_account($user_name, $user_email, $user_phone, $site_name);
+
+    if (!isset($json_output["error"])) {
+        $user_id = $json_output["user_id"];
+        $site_id = $json_output["site_id"];
+        $api_key = $json_output["api_key"];
+        $preview_url = $json_output["preview_url"];
+
+        drupal_set_message(t('New account form has been created with preview url <a href="') . $preview_url . '">' . $preview_url . '</a>');
+        //drupal_set_message(t('Return is -> ' . json_encode($json_output)));
+
+        variable_set('yottaa_user_id', $user_id);
+        variable_set('yottaa_site_id', $site_id);
+        variable_set('yottaa_api_key', $api_key);
+
+        unset ($form_state['storage']);
+        menu_rebuild();
+        drupal_goto('admin/settings/yottaa');
+    } else {
+        $error = $json_output["error"];
+        form_set_error('', 'Error received from creating Yottaa user:' . json_encode($error));
+    }
+
+}
+
+/**
+ * Prepare and generate entry form for Yottaa settings.
+ */
+function yottaa_admin_settings()
+{
+    $form['yottaa_settings'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Yottaa Settings'),
+        '#description' => t('Settings for Yottaa account including user id, api key and site id.'),
+        '#collapsible' => FALSE,
+        '#collapsed' => FALSE,
+    );
+
+    $form['yottaa_settings']['yottaa_user_id'] = array(
+        '#type' => 'textfield',
+        '#title' => t('User Id'),
+        '#description' => t('Specify the Yottaa User Id.'),
+        '#default_value' => variable_get('yottaa_user_id', ''),
+    );
+
+    $form['yottaa_settings']['yottaa_api_key'] = array(
+        '#type' => 'textfield',
+        '#title' => t('API Key'),
+        '#description' => t('Specify the Yottaa API Key.'),
+        '#default_value' => variable_get('yottaa_api_key', ''),
+    );
+
+    $form['yottaa_settings']['yottaa_site_id'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Site Id'),
+        '#description' => t('Specify the Yottaa Site Id.'),
+        '#default_value' => variable_get('yottaa_site_id', ''),
+    );
+
+    $form = system_settings_form($form);
+
+    $form['#submit'][] = 'menu_rebuild';
+
+    return $form;
+}
+
+/**
+ * Validate Setting inputs for Yottaa
+ */
+function yottaa_admin_settings_validate($form, &$form_state)
+{
+
+    // user id is required
+
+    /*
+    $user_id = $form_state['values']['yottaa_user_id'];
+    if ($user_id == '') {
+        form_set_error('yottaa_user_id', t('You must specify the Yottaa User Id.'));
+    }
+
+    // api key is required
+    $api_key = $form_state['values']['yottaa_api_key'];
+    if ($api_key == '') {
+        form_set_error('yottaa_api_key', t('You must specify the Yottaa API Key.'));
+    }
+
+    // site id is required
+    $site_id = $form_state['values']['yottaa_site_id'];
+    if ($site_id == '') {
+        form_set_error('yottaa_site_id', t('You must specify the Yottaa Site Id.'));
+    }
+    */
+
+    // attempt to authenticate
+    /*
+    if (yottaa_utils_get_ticket() == '') {
+        form_set_error('', t('Could not authenticate with userid.'));
+    } else {
+        drupal_set_message('Yottaa Repo Info:<br/>' . yottaa_info());
+    }
+    */
+
+}
+
+/**
+ * Return permissions for the Yottaa module.
+ */
+function yottaa_perm()
+{
+    $perms = array('administer yottaa', 'access yottaa');
+    return $perms;
+}
+
+/**
+ * Register custom themes for yottaa module.
+ *
+ */
+function yottaa_theme()
+{
+    return array(
+        'yottaa_info' => array(
+            'arguments' => array('context' => NULL),
+            'file' => 'yottaa.theme.inc'
+        ),
+        'yottaa_optimizer_activate_form' => array(
+            'arguments' => array('form' => NULL),
+            'file' => 'yottaa.theme.inc',
+            'render element' => 'form',
+        ),
+        'yottaa_clear_cache_form' => array(
+            'arguments' => array('form' => NULL),
+            'file' => 'yottaa.theme.inc',
+            'render element' => 'form',
+        )
+    );
+}
+
+function yottaa_info()
+{
+    return theme('yottaa_info', array(
+                                     'children' => ''
+                                ));
+}
+
+/**
+ * Implementation of hook_block() for Yottaa Module.
+ */
+function yottaa_block($op = 'list', $delta = 0, $edit = array())
+{
+}
+
+/**
+ * Implementation of hook_form().
+ *
+ */
+function yottaa_optimizer_activate_form($form, &$form_state)
+{
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#name' => 'activate',
+        '#default_value' => 'Activate Optimizations',
+    );
+
+    return $form;
+}
+
+/**
+ * Implementation of hook_form_submit
+ *
+ */
+function yottaa_optimizer_activate_form_submit($form, &$form_state)
+{
+    unset($form_state['storage']);
+    $form_state['redirect'] = 'admin/settings/yottaa';
+}
+
+/**
+ * Implementation of hook_form().
+ *
+ */
+function yottaa_clear_cache_form($form, &$form_state)
+{
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#name' => 'clear',
+        '#default_value' => 'Clear Cache',
+    );
+
+    return $form;
+}
+
+/**
+ * Implementation of hook_form_submit
+ *
+ */
+function yottaa_clear_cache_form_submit($form, &$form_state)
+{
+    unset($form_state['storage']);
+    $form_state['redirect'] = 'admin/settings/yottaa';
+}
+
+
