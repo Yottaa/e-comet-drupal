@@ -1,0 +1,5 @@
+name = Yottaa
+description = Provides Yottaa/Drupal integration.
+core = 7.x
+version = 1.0
+configure = admin/settings/yottaa
