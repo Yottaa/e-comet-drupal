@@ -1,0 +1,51 @@
+h1 img {
+    height: 32px;
+    float: right;
+}
+
+.status-preview {
+    color: orange;
+    font-weight: bold
+}
+
+.status-live {
+    color: green;
+    font-weight: bold
+}
+
+.status-paused, .status-error {
+    color: red;
+    font-weight: bold
+}
+
+.setting span {
+    display: inline-block;
+    width: 100px;
+    font-weight: bold;
+}
+
+#yottaa-clear-cache-form table,
+#yottaa-clear-cache-form table tr,
+#yottaa-clear-cache-form table tr td,
+#yottaa-optimizer-activate-form table,
+#yottaa-optimizer-activate-form table tr,
+#yottaa-optimizer-activate-form table tr td,
+#yottaa-optimizer-resume-form table,
+#yottaa-optimizer-resume-form table tr,
+#yottaa-optimizer-resume-form table tr td,
+#yottaa-optimizer-pause-form table,
+#yottaa-optimizer-pause-form table tr,
+#yottaa-optimizer-pause-form table tr td {
+    border: none;
+}
+
+input.form-submit {
+    width: 175px;
+}
+
+#yottaa-clear-cache-form table:first-child tr:first-child td:first-child,
+#yottaa-optimizer-activate-form table:first-child tr:first-child td:first-child,
+#yottaa-optimizer-resume-form table:first-child tr:first-child td:first-child,
+#yottaa-optimizer-pause-form table:first-child tr:first-child td:first-child{
+    width: 200px;
+}

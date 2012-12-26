@@ -292,6 +292,16 @@ function yottaa_theme()
             'file' => 'yottaa.theme.inc',
             'render element' => 'form',
         ),
+        'yottaa_optimizer_pause_form' => array(
+            'arguments' => array('form' => NULL),
+            'file' => 'yottaa.theme.inc',
+            'render element' => 'form',
+        ),
+        'yottaa_optimizer_resume_form' => array(
+            'arguments' => array('form' => NULL),
+            'file' => 'yottaa.theme.inc',
+            'render element' => 'form',
+        ),
         'yottaa_clear_cache_form' => array(
             'arguments' => array('form' => NULL),
             'file' => 'yottaa.theme.inc',
@@ -343,6 +353,72 @@ function yottaa_optimizer_activate_form_submit($form, &$form_state)
  * Implementation of hook_form().
  *
  */
+function yottaa_optimizer_pause_form($form, &$form_state)
+{
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#name' => 'activate',
+        '#default_value' => 'Pause Optimizations',
+    );
+
+    return $form;
+}
+
+/**
+ * Implementation of hook_form_submit
+ *
+ */
+function yottaa_optimizer_pause_form_submit($form, &$form_state)
+{
+    unset($form_state['storage']);
+    $json_output = pause_yottaa_optimizer();
+
+    if (!isset($json_output["error"])) {
+        $form_state['redirect'] = 'admin/settings/yottaa';
+    } else {
+        $error = $json_output["error"];
+        form_set_error('', 'Error received from pausing Yottaa optimizer:' . json_encode($error));
+    }
+
+}
+
+/**
+ * Implementation of hook_form().
+ *
+ */
+function yottaa_optimizer_resume_form($form, &$form_state)
+{
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#name' => 'activate',
+        '#default_value' => 'Resume Optimizations',
+    );
+
+    return $form;
+}
+
+/**
+ * Implementation of hook_form_submit
+ *
+ */
+function yottaa_optimizer_resume_form_submit($form, &$form_state)
+{
+    unset($form_state['storage']);
+
+    $json_output = resume_yottaa_optimizer();
+
+    if (!isset($json_output["error"])) {
+        $form_state['redirect'] = 'admin/settings/yottaa';
+    } else {
+        $error = $json_output["error"];
+        form_set_error('', 'Error received from resuming Yottaa optimizer:' . json_encode($error));
+    }
+}
+
+/**
+ * Implementation of hook_form().
+ *
+ */
 function yottaa_clear_cache_form($form, &$form_state)
 {
     $form['submit'] = array(
@@ -361,7 +437,15 @@ function yottaa_clear_cache_form($form, &$form_state)
 function yottaa_clear_cache_form_submit($form, &$form_state)
 {
     unset($form_state['storage']);
-    $form_state['redirect'] = 'admin/settings/yottaa';
+    $json_output = flush_yottaa_cache();
+
+    if (!isset($json_output["error"])) {
+        $form_state['redirect'] = 'admin/settings/yottaa';
+    } else {
+        $error = $json_output["error"];
+        form_set_error('', 'Error received from flushing Yottaa cache:' . json_encode($error));
+    }
+
 }
 
 

@@ -166,7 +166,7 @@ function check_yottaa_status()
  *
  * @return mixed
  */
-function check_yottaa_resume()
+function resume_yottaa_optimizer()
 {
     $yottaa_user_id = variable_get('yottaa_user_id', '');
     $yottaa_api_key = variable_get('yottaa_api_key', '');
@@ -180,7 +180,7 @@ function check_yottaa_resume()
  *
  * @return mixed
  */
-function check_yottaa_pause()
+function pause_yottaa_optimizer()
 {
     $yottaa_user_id = variable_get('yottaa_user_id', '');
     $yottaa_api_key = variable_get('yottaa_api_key', '');
@@ -194,7 +194,7 @@ function check_yottaa_pause()
  *
  * @return mixed
  */
-function check_yottaa_settings()
+function retrieve_yottaa_settings()
 {
     $yottaa_user_id = variable_get('yottaa_user_id', '');
     $yottaa_api_key = variable_get('yottaa_api_key', '');
@@ -208,7 +208,7 @@ function check_yottaa_settings()
  *
  * @return mixed
  */
-function check_yottaa_flush_cache()
+function flush_yottaa_cache()
 {
     $yottaa_user_id = variable_get('yottaa_user_id', '');
     $yottaa_api_key = variable_get('yottaa_api_key', '');
