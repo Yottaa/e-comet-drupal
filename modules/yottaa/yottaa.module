@@ -374,6 +374,7 @@ function yottaa_optimizer_pause_form_submit($form, &$form_state)
     $json_output = pause_yottaa_optimizer();
 
     if (!isset($json_output["error"])) {
+        drupal_set_message(t('Your Yottaa optimizer has been paused.'));
         $form_state['redirect'] = 'admin/settings/yottaa';
     } else {
         $error = $json_output["error"];
@@ -408,6 +409,7 @@ function yottaa_optimizer_resume_form_submit($form, &$form_state)
     $json_output = resume_yottaa_optimizer();
 
     if (!isset($json_output["error"])) {
+        drupal_set_message(t('Your Yottaa optimizer has been resumed.'));
         $form_state['redirect'] = 'admin/settings/yottaa';
     } else {
         $error = $json_output["error"];
@@ -440,6 +442,7 @@ function yottaa_clear_cache_form_submit($form, &$form_state)
     $json_output = flush_yottaa_cache();
 
     if (!isset($json_output["error"])) {
+        drupal_set_message(t('Cache for all of your sites resources has been removed from Yottaa CDN.'));
         $form_state['redirect'] = 'admin/settings/yottaa';
     } else {
         $error = $json_output["error"];

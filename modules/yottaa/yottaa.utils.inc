@@ -199,8 +199,8 @@ function retrieve_yottaa_settings()
     $yottaa_user_id = variable_get('yottaa_user_id', '');
     $yottaa_api_key = variable_get('yottaa_api_key', '');
     $yottaa_site_id = variable_get('yottaa_site_id', '');
-    $output = curl_post_async("https://api.yottaa.com/optimizers/" . $yottaa_site_id . "/settings", array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
-    return json_decode(parseHttpResponse($output), true);
+    $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id . "/settings", array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
+    return post_processing_settings(json_decode(parseHttpResponse($output), true));
 }
 
 /**
@@ -215,4 +215,87 @@ function flush_yottaa_cache()
     $yottaa_site_id = variable_get('yottaa_site_id', '');
     $output = curl_post_async("https://api.yottaa.com/optimizers/" . $yottaa_site_id . "/flush_cache", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
     return json_decode(parseHttpResponse($output), true);
+}
+
+
+/**
+ * Post-process settings return from Yottaa service.
+ *
+ * @param $json_output
+ * @return array
+ */
+function post_processing_settings($json_output)
+{
+    if (!isset($json_output["error"])) {
+
+        $prod_key = "product";
+        $cat_key = "category";
+
+        $prod_caching = 'unknown';
+        $cat_caching = 'unknown';
+        $ajax_cart_caching = 'unknown';
+        $admin_caching = 'unknown';
+
+        $site_pages_caching = 'unknown';
+        $exclusions = '';
+
+        if (isset($json_output["defaultActions"]) && isset($json_output["defaultActions"]["resourceActions"]) && isset($json_output["defaultActions"]["resourceActions"]["htmlCache"])) {
+            $html_cachings = $json_output["defaultActions"]["resourceActions"]["htmlCache"];
+            foreach ($html_cachings as &$html_caching) {
+                if (isset($html_caching["filters"])) {
+                    $filters = $html_caching["filters"];
+                    foreach ($filters as &$filter) {
+                        if (isset($filter["match"])) {
+                            $direction = $filter["direction"] == 1 ? "included" : "excluded";
+                            $matches = $filter["match"];
+                            foreach ($matches as &$match) {
+                                if (isset($match["condition"])) {
+                                    if (!(strpos($match["condition"], $prod_key) === false)) {
+                                        $prod_caching = $direction;
+                                    }
+                                    if (!(strpos($match["condition"], $cat_key) === false)) {
+                                        $cat_caching = $direction;
+                                    }
+                                    if (!(strpos($match["condition"], 'ajax_cart') === false)) {
+                                        $ajax_cart_caching = $direction;
+                                    }
+                                    if (!(strpos($match["condition"], 'admin.mvc') === false)) {
+                                        $admin_caching = $direction;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (isset($json_output["defaultActions"]) && isset($json_output["defaultActions"]["filters"])) {
+            $filters = $json_output["defaultActions"]["filters"];
+            foreach ($filters as &$filter) {
+                if (isset($filter["match"])) {
+                    if ($filter["direction"] == 0) {
+                        $matches = $filter["match"];
+                        foreach ($matches as &$match) {
+                            if (isset($match["condition"])) {
+                                if ($exclusions != '') {
+                                    $exclusions = $exclusions . ' ; ';
+                                }
+                                $exclusions = $exclusions . $match["condition"];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return array('prod_caching' => $prod_caching,
+                     'cat_caching' => $cat_caching,
+                     'ajax_cart_caching' => $ajax_cart_caching,
+                     'admin_caching' => $admin_caching,
+                     'site_pages_caching' => $site_pages_caching,
+                     'exclusions' => $exclusions);
+    } else {
+        return $json_output;
+    }
 }

@@ -18,7 +18,7 @@ h1 img {
     font-weight: bold
 }
 
-.setting span {
+.setting span.setting-item-title {
     display: inline-block;
     width: 100px;
     font-weight: bold;
@@ -48,4 +48,10 @@ input.form-submit {
 #yottaa-optimizer-resume-form table:first-child tr:first-child td:first-child,
 #yottaa-optimizer-pause-form table:first-child tr:first-child td:first-child{
     width: 200px;
+}
+
+.setting span.checklist-item-title {
+    display: inline-block;
+    width: 300px;
+    font-weight: bold;
 }

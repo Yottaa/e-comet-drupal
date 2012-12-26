@@ -55,12 +55,23 @@ function theme_yottaa_info($variables)
     }
 
     $contents .= '<h3>Settings</h3>';
-    $contents .= '<div class="setting"><span>User Id</span>' . $yottaa_user_id .'<div>';
-    $contents .= '<div class="setting"><span>API Key</span>' . $yottaa_api_key .'<div>';
-    $contents .= '<div class="setting"><span>Site Id</span>' . $yottaa_site_id .'<div>';
+    $contents .= '<div class="setting"><span class="setting-item-title">User Id</span>' . $yottaa_user_id .'<div>';
+    $contents .= '<div class="setting"><span class="setting-item-title">API Key</span>' . $yottaa_api_key .'<div>';
+    $contents .= '<div class="setting"><span class="setting-item-title">Site Id</span>' . $yottaa_site_id .'<div>';
     $contents .= '<div class="setting">' . l(t('Advanced Configuration'), 'admin/settings/yottaa/existing_user') . '</div>';
 
     $contents .= '<h3>Checklist</h3>';
+
+    $settings = retrieve_yottaa_settings();
+
+    if (!isset($settings["error"])) {
+        $contents .= '<div class="checklist-items">';
+        $contents .= '<div class="checklist-item"><span class="checklist-item-title">Enable caching of product pages</span>' . $settings["prod_caching"] .'<div>';
+        $contents .= '<div class="checklist-item"><span class="checklist-item-title">Exclusions</span>' . $settings["exclusions"] .'<div>';
+        $contents .= '</div>';
+    } else {
+        $contents .= '<div class="checklist-error">' . json_encode($error) . '</div>';
+    }
 
     return $contents;
 }
