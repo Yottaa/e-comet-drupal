@@ -10,6 +10,20 @@
  */
 
 /**
+ * Implementation of hook_boot() for Yottaa module.
+ *
+ */
+function yottaa_boot()
+{
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        $addrs = explode(",", $ip);
+        $_SERVER['PROXY_REMOTE_ADDR'] = $_SERVER['REMOTE_ADDR'];
+        $_SERVER['REMOTE_ADDR'] = trim($addrs[0]);
+    }
+}
+
+/**
  * Implementation of hook_init() for Yottaa module.
  *
  */
