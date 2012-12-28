@@ -299,3 +299,24 @@ function post_processing_settings($json_output)
         return $json_output;
     }
 }
+
+/**
+ * Automatically flushes cache for an updated node or a node whose comments have been updated,
+ * created or deleted.
+ *
+ *
+ * @param $node
+ * @return void
+ */
+function auto_flush_yottaa_cache($node)
+{
+    $yottaa_auto_clear_cache = variable_get('yottaa_auto_clear_cache', 1);
+    if ($yottaa_auto_clear_cache == 1) {
+        $json_output = flush_yottaa_cache();
+        // drupal_set_message(t('Cache flushed!'));
+        if (isset($json_output["error"])) {
+            $error = $json_output["error"];
+            form_set_error('', 'Error received from flushing Yottaa cache:' . json_encode($error));
+        }
+    }
+}

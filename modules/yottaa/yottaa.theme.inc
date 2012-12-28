@@ -55,10 +55,11 @@ function theme_yottaa_info($variables)
     }
 
     $contents .= '<h3>Settings</h3>';
+    $contents .= drupal_render((drupal_get_form('yottaa_auto_clear_cache_form')));
     $contents .= '<div class="setting"><span class="setting-item-title">User Id</span>' . $yottaa_user_id .'<div>';
     $contents .= '<div class="setting"><span class="setting-item-title">API Key</span>' . $yottaa_api_key .'<div>';
     $contents .= '<div class="setting"><span class="setting-item-title">Site Id</span>' . $yottaa_site_id .'<div>';
-    $contents .= '<div class="setting">' . l(t('Advanced Configuration'), 'admin/settings/yottaa/existing_user') . '</div>';
+    $contents .= '<div class="setting">' . l(t('Advanced Configuration'), 'admin/config/system/yottaa/existing_user') . '</div>';
 
     $contents .= '<h3>Checklist</h3>';
 
@@ -126,4 +127,17 @@ function theme_yottaa_clear_cache_form($variables) {
   $rows = array(array(drupal_render($form['submit']),t('Clearing the cache will remove all of your sites resources from our CDN. Use this option if you have updated a resource (gif, css, JavaScript).')));
 
   return theme('table', array('rows' => $rows)) . drupal_render_children($form);
+}
+
+/**
+ * Custom theme for yottaa auto clear cache setting form.
+ *
+ * @param $form
+ */
+function theme_yottaa_auto_clear_cache_form($variables) {
+  $form = $variables['form'];
+
+  $rows = array(array(drupal_render($form['submit'])));
+
+  return drupal_render_children($form) . theme('table', array('rows' => $rows));
 }

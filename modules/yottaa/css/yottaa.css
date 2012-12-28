@@ -24,6 +24,9 @@ h1 img {
     font-weight: bold;
 }
 
+#yottaa-auto-clear-cache-form table,
+#yottaa-auto-clear-cache-form table tr,
+#yottaa-auto-clear-cache-form table tr td,
 #yottaa-clear-cache-form table,
 #yottaa-clear-cache-form table tr,
 #yottaa-clear-cache-form table tr td,
