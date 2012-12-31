@@ -67,8 +67,8 @@ function theme_yottaa_info($variables)
 
     if (!isset($settings["error"])) {
         $contents .= '<div class="checklist-items">';
-        $contents .= '<div class="checklist-item"><span class="checklist-item-title">Enable caching of product pages</span>' . $settings["prod_caching"] .'<div>';
-        $contents .= '<div class="checklist-item"><span class="checklist-item-title">Exclusions</span>' . $settings["exclusions"] .'<div>';
+        $contents .= '<div class="checklist-item"><span class="checklist-item-title">Enable caching of all pages</span>' . $settings["site_pages_caching"] .'<div>';
+        //$contents .= '<div class="checklist-item"><span class="checklist-item-title">Exclusions</span>' . $settings["exclusions"] .'<div>';
         $contents .= '</div>';
     } else {
         $contents .= '<div class="checklist-error">' . json_encode($error) . '</div>';
@@ -85,9 +85,14 @@ function theme_yottaa_info($variables)
 function theme_yottaa_optimizer_activate_form($variables) {
   $form = $variables['form'];
 
-  $rows = array(array(drupal_render($form['submit']),t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
+  $yottaa_site_id = variable_get('yottaa_site_id', '');
+  $active_link = '<a class="button" href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id. '" target="_blank"> Activate Optimizations</a>';
 
-  return theme('table', array('rows' => $rows)) . drupal_render_children($form);
+  //$rows = array(array(drupal_render($form['submit']),t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
+  $rows = array(array(t($active_link),t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
+
+  //return theme('table', array('rows' => $rows)) . drupal_render_children($form);
+  return theme('table', array('rows' => $rows));
 }
 
 /**

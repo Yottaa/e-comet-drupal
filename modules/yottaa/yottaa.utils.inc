@@ -230,6 +230,7 @@ function post_processing_settings($json_output)
 
         $prod_key = "product";
         $cat_key = "category";
+        $site_pages_key = "(.*)";
 
         $prod_caching = 'unknown';
         $cat_caching = 'unknown';
@@ -261,6 +262,9 @@ function post_processing_settings($json_output)
                                     }
                                     if (!(strpos($match["condition"], 'admin.mvc') === false)) {
                                         $admin_caching = $direction;
+                                    }
+                                    if (!(strpos($match["condition"], $site_pages_key) === false)) {
+                                        $site_pages_caching = $direction;
                                     }
                                 }
                             }
