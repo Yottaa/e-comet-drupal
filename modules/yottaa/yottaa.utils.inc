@@ -231,6 +231,7 @@ function post_processing_settings($json_output)
         $prod_key = "product";
         $cat_key = "category";
         $site_pages_key = "(.*)";
+        $edit_pages_key = "/edit";
 
         $prod_caching = 'unknown';
         $cat_caching = 'unknown';
@@ -238,6 +239,7 @@ function post_processing_settings($json_output)
         $admin_caching = 'unknown';
 
         $site_pages_caching = 'unknown';
+        $edit_pages_caching = 'unknown';
         $exclusions = '';
 
         if (isset($json_output["defaultActions"]) && isset($json_output["defaultActions"]["resourceActions"]) && isset($json_output["defaultActions"]["resourceActions"]["htmlCache"])) {
@@ -265,6 +267,9 @@ function post_processing_settings($json_output)
                                     }
                                     if (!(strpos($match["condition"], $site_pages_key) === false)) {
                                         $site_pages_caching = $direction;
+                                    }
+                                    if (!(strpos($match["condition"], $edit_pages_key) === false)) {
+                                        $edit_pages_caching = $direction;
                                     }
                                 }
                             }
@@ -298,6 +303,7 @@ function post_processing_settings($json_output)
                      'ajax_cart_caching' => $ajax_cart_caching,
                      'admin_caching' => $admin_caching,
                      'site_pages_caching' => $site_pages_caching,
+                     'edit_pages_caching' => $edit_pages_caching,
                      'exclusions' => $exclusions);
     } else {
         return $json_output;

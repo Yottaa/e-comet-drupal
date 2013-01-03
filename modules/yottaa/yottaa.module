@@ -15,12 +15,18 @@
  */
 function yottaa_boot()
 {
-    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        $addrs = explode(",", $ip);
-        $_SERVER['PROXY_REMOTE_ADDR'] = $_SERVER['REMOTE_ADDR'];
-        $_SERVER['REMOTE_ADDR'] = trim($addrs[0]);
-    }
+
+    //$json_output = check_yottaa_status();
+    //$yottaa_status = $json_output["optimizer"];
+
+    //if (!isset($json_output["error"]) && $yottaa_status == 'live') {
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            $addrs = explode(",", $ip);
+            $_SERVER['PROXY_REMOTE_ADDR'] = $_SERVER['REMOTE_ADDR'];
+            $_SERVER['REMOTE_ADDR'] = trim($addrs[0]);
+        }
+    //}
 }
 
 /**
@@ -484,6 +490,15 @@ function yottaa_auto_clear_cache_form($form, &$form_state)
         '#default_value' => variable_get('yottaa_auto_clear_cache', 1)
     );
 
+    //$json_output = check_yottaa_status();
+    //$default_proxy_mode = $json_output["optimizer"] == 'live' ? 1 : 0;
+
+    $form['yottaa_enable_proxy_mode'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable drupal proxy mode.'),
+        '#default_value' => variable_get('reverse_proxy', 0)
+    );
+
     $form['submit'] = array(
         '#type' => 'submit',
         '#name' => 'clear',
@@ -501,8 +516,11 @@ function yottaa_auto_clear_cache_form_submit($form, &$form_state)
 {
     unset($form_state['storage']);
     variable_set('yottaa_auto_clear_cache', intval($form_state['values']['yottaa_auto_clear_cache']));
+    variable_set('reverse_proxy', intval($form_state['values']['yottaa_enable_proxy_mode']));
     $status = intval($form_state['values']['yottaa_auto_clear_cache']) == 1 ? 'enabled' : 'disabled';
     drupal_set_message(t('Automatically clearing Yottaa\'s site optimizer cache is ' . $status . '.'));
+    $status = intval($form_state['values']['yottaa_enable_proxy_mode']) == 1 ? 'enabled' : 'disabled';
+    drupal_set_message(t('Proxy mode is ' . $status . '.'));
 }
 
 /**
