@@ -20,12 +20,23 @@ function yottaa_boot()
     //$yottaa_status = $json_output["optimizer"];
 
     //if (!isset($json_output["error"]) && $yottaa_status == 'live') {
+
+        /*
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
             $addrs = explode(",", $ip);
             $_SERVER['PROXY_REMOTE_ADDR'] = $_SERVER['REMOTE_ADDR'];
             $_SERVER['REMOTE_ADDR'] = trim($addrs[0]);
         }
+        */
+
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $reverse_proxy_addresses = variable_get('reverse_proxy_addresses', array());
+            $reverse_proxy_addresses[] = $_SERVER['REMOTE_ADDR'];
+            variable_set('reverse_proxy', 1);
+            variable_set('reverse_proxy_addresses', $reverse_proxy_addresses );
+        }
+
     //}
 }
 

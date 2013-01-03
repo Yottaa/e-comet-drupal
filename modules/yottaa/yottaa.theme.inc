@@ -4,7 +4,7 @@ function theme_yottaa_info($variables)
 {
     // Render output
     drupal_add_css(drupal_get_path('module', 'yottaa') . '/css/yottaa.css');
-    $contents = '<h1>' . theme('image', array('path' => drupal_get_path('module', 'yottaa') . '/images/yottaa.png')) . '<strong>My Yottaa Page</strong></h1>';
+    $contents = '<h1>' . theme('image', array('path' => drupal_get_path('module', 'yottaa') . '/images/yottaa.png')) . '<strong>My Yottaa Page (Proxy IP: ' . $_SERVER['REMOTE_ADDR'] . '; Client IP:' . ip_address() . ')</strong></h1>';
 
     $yottaa_site_id = variable_get('yottaa_site_id', '');
     $yottaa_user_id = variable_get('yottaa_user_id', '');
@@ -56,9 +56,9 @@ function theme_yottaa_info($variables)
 
     $contents .= '<h3>Settings</h3>';
     $contents .= drupal_render((drupal_get_form('yottaa_auto_clear_cache_form')));
-    $contents .= '<div class="setting"><span class="setting-item-title">User Id</span>' . $yottaa_user_id .'</div>';
-    $contents .= '<div class="setting"><span class="setting-item-title">API Key</span>' . $yottaa_api_key .'</div>';
-    $contents .= '<div class="setting"><span class="setting-item-title">Site Id</span>' . $yottaa_site_id .'</div>';
+    $contents .= '<div class="setting"><span class="setting-item-title">User Id</span>' . $yottaa_user_id . '</div>';
+    $contents .= '<div class="setting"><span class="setting-item-title">API Key</span>' . $yottaa_api_key . '</div>';
+    $contents .= '<div class="setting"><span class="setting-item-title">Site Id</span>' . $yottaa_site_id . '</div>';
     $contents .= '<div class="setting">' . l(t('Advanced Configuration'), 'admin/config/system/yottaa/existing_user') . '</div>';
 
     $contents .= '<h3>Checklist</h3>';
@@ -67,7 +67,7 @@ function theme_yottaa_info($variables)
 
     if (!isset($settings["error"])) {
         $contents .= '<div class="checklist-items">';
-        $contents .= '<div class="checklist-item"><span class="checklist-item-title">Enable caching of all pages</span>' . $settings["site_pages_caching"] .'<div>';
+        $contents .= '<div class="checklist-item"><span class="checklist-item-title">Enable caching of all pages</span>' . $settings["site_pages_caching"] . '<div>';
         $contents .= '<div class="checklist-item"><span class="checklist-item-title">Disable caching of node editing pages</span>';
         if ($settings["edit_pages_caching"] == 'excluded') {
             $contents .= '<span class="checklist-item-status checklist-item-status-passed">Passed</span></div>';
@@ -97,17 +97,18 @@ function theme_yottaa_info($variables)
  *
  * @param $form
  */
-function theme_yottaa_optimizer_activate_form($variables) {
-  $form = $variables['form'];
+function theme_yottaa_optimizer_activate_form($variables)
+{
+    $form = $variables['form'];
 
-  $yottaa_site_id = variable_get('yottaa_site_id', '');
-  $active_link = '<a class="button" href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id. '" target="_blank"> Activate Optimizations</a>';
+    $yottaa_site_id = variable_get('yottaa_site_id', '');
+    $active_link = '<a class="button" href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '" target="_blank"> Activate Optimizations</a>';
 
-  //$rows = array(array(drupal_render($form['submit']),t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
-  $rows = array(array(t($active_link),t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
+    //$rows = array(array(drupal_render($form['submit']),t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
+    $rows = array(array(t($active_link), t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
 
-  //return theme('table', array('rows' => $rows)) . drupal_render_children($form);
-  return theme('table', array('rows' => $rows));
+    //return theme('table', array('rows' => $rows)) . drupal_render_children($form);
+    return theme('table', array('rows' => $rows));
 }
 
 /**
@@ -115,12 +116,13 @@ function theme_yottaa_optimizer_activate_form($variables) {
  *
  * @param $form
  */
-function theme_yottaa_optimizer_pause_form($variables) {
-  $form = $variables['form'];
+function theme_yottaa_optimizer_pause_form($variables)
+{
+    $form = $variables['form'];
 
-  $rows = array(array(drupal_render($form['submit']),t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
+    $rows = array(array(drupal_render($form['submit']), t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
 
-  return theme('table', array('rows' => $rows)) . drupal_render_children($form);
+    return theme('table', array('rows' => $rows)) . drupal_render_children($form);
 }
 
 /**
@@ -128,12 +130,13 @@ function theme_yottaa_optimizer_pause_form($variables) {
  *
  * @param $form
  */
-function theme_yottaa_optimizer_resume_form($variables) {
-  $form = $variables['form'];
+function theme_yottaa_optimizer_resume_form($variables)
+{
+    $form = $variables['form'];
 
-  $rows = array(array(drupal_render($form['submit']),t('Starting optimization will apply optimizations on your website within 5minutes.')));
+    $rows = array(array(drupal_render($form['submit']), t('Starting optimization will apply optimizations on your website within 5minutes.')));
 
-  return theme('table', array('rows' => $rows)) . drupal_render_children($form);
+    return theme('table', array('rows' => $rows)) . drupal_render_children($form);
 }
 
 /**
@@ -141,12 +144,13 @@ function theme_yottaa_optimizer_resume_form($variables) {
  *
  * @param $form
  */
-function theme_yottaa_clear_cache_form($variables) {
-  $form = $variables['form'];
+function theme_yottaa_clear_cache_form($variables)
+{
+    $form = $variables['form'];
 
-  $rows = array(array(drupal_render($form['submit']),t('Clearing the cache will remove all of your sites resources from our CDN. Use this option if you have updated a resource (gif, css, JavaScript).')));
+    $rows = array(array(drupal_render($form['submit']), t('Clearing the cache will remove all of your sites resources from our CDN. Use this option if you have updated a resource (gif, css, JavaScript).')));
 
-  return theme('table', array('rows' => $rows)) . drupal_render_children($form);
+    return theme('table', array('rows' => $rows)) . drupal_render_children($form);
 }
 
 /**
@@ -154,10 +158,11 @@ function theme_yottaa_clear_cache_form($variables) {
  *
  * @param $form
  */
-function theme_yottaa_auto_clear_cache_form($variables) {
-  $form = $variables['form'];
+function theme_yottaa_auto_clear_cache_form($variables)
+{
+    $form = $variables['form'];
 
-  $rows = array(array(drupal_render($form['submit'])));
+    $rows = array(array(drupal_render($form['submit'])));
 
-  return drupal_render_children($form) . theme('table', array('rows' => $rows));
+    return drupal_render_children($form) . theme('table', array('rows' => $rows));
 }
