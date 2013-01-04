@@ -67,7 +67,16 @@ function theme_yottaa_info($variables)
 
     if (!isset($settings["error"])) {
         $contents .= '<div class="checklist-items">';
-        $contents .= '<div class="checklist-item"><span class="checklist-item-title">Enable caching of all pages</span>' . $settings["site_pages_caching"] . '<div>';
+        // Site pages
+        $contents .= '<div class="checklist-item"><span class="checklist-item-title">Enable caching of site pages</span>';
+        if ($settings["site_pages_caching"] == 'included') {
+            $contents .= '<span class="checklist-item-status checklist-item-status-passed">Passed</span></div>';
+        } else {
+            $contents .= '<span class="checklist-item-status checklist-item-status-failed">Failed</span></div>';
+            $contents .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> which includes resource from optimization if URI contains "/" and Request-Header whose name equals to "Cookie" and whose value doesen\'t contain "SESS" <div>';
+        }
+        $contents .= '</div>';
+        // Edit pages
         $contents .= '<div class="checklist-item"><span class="checklist-item-title">Disable caching of node editing pages</span>';
         if ($settings["edit_pages_caching"] == 'excluded') {
             $contents .= '<span class="checklist-item-status checklist-item-status-passed">Passed</span></div>';
@@ -76,6 +85,17 @@ function theme_yottaa_info($variables)
             $contents .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exclude exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> with a "contains" expression of <strong>/edit</strong>.<div>';
         }
         $contents .= '</div>';
+        // Configure pages
+        $contents .= '<div class="checklist-item"><span class="checklist-item-title">Disable caching of configuration pages</span>';
+        if ($settings["configure_pages_caching"] == 'excluded') {
+            $contents .= '<span class="checklist-item-status checklist-item-status-passed">Passed</span></div>';
+        } else {
+            $contents .= '<span class="checklist-item-status checklist-item-status-failed">Failed</span></div>';
+            $contents .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exclude exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> with a "contains" expression of <strong>admin/configure</strong>.<div>';
+            $contents .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exclude exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> with a "contains" expression of <strong>admin%252Fconfig</strong>.<div>';
+        }
+        $contents .= '</div>';
+        // Proxy mode
         $contents .= '<div class="checklist-item"><span class="checklist-item-title">Enable drupal proxy mode</span>';
         if (variable_get('reverse_proxy', 0) == 0 && $yottaa_status == 'live') {
             $contents .= '<span class="checklist-item-status checklist-item-status-failed">Failed</span></div>';

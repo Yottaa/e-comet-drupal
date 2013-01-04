@@ -228,19 +228,20 @@ function post_processing_settings($json_output)
 {
     if (!isset($json_output["error"])) {
 
-        $prod_key = "product";
-        $cat_key = "category";
-        $site_pages_key = "(.*)";
+        $site_pages_key = "/";
+        $configure_pages_key1 = "admin/config";
+        $configure_pages_key2 = "admin%252Fconfig";
         $edit_pages_key = "/edit";
-
-        $prod_caching = 'unknown';
-        $cat_caching = 'unknown';
-        $ajax_cart_caching = 'unknown';
-        $admin_caching = 'unknown';
 
         $site_pages_caching = 'unknown';
         $edit_pages_caching = 'unknown';
+        $configure_pages_caching = 'unknown';
+        $configure_pages_caching1 = 'unknown';
+        $configure_pages_caching2 = 'unknown';
+
         $exclusions = '';
+
+        $excluded_sess_cookie = 'unknown';
 
         if (isset($json_output["defaultActions"]) && isset($json_output["defaultActions"]["resourceActions"]) && isset($json_output["defaultActions"]["resourceActions"]["htmlCache"])) {
             $html_cachings = $json_output["defaultActions"]["resourceActions"]["htmlCache"];
@@ -253,25 +254,29 @@ function post_processing_settings($json_output)
                             $matches = $filter["match"];
                             foreach ($matches as &$match) {
                                 if (isset($match["condition"])) {
-                                    if (!(strpos($match["condition"], $prod_key) === false)) {
-                                        $prod_caching = $direction;
-                                    }
-                                    if (!(strpos($match["condition"], $cat_key) === false)) {
-                                        $cat_caching = $direction;
-                                    }
-                                    if (!(strpos($match["condition"], 'ajax_cart') === false)) {
-                                        $ajax_cart_caching = $direction;
-                                    }
-                                    if (!(strpos($match["condition"], 'admin.mvc') === false)) {
-                                        $admin_caching = $direction;
-                                    }
-                                    if (!(strpos($match["condition"], $site_pages_key) === false)) {
+                                    if ($match["condition"] == $site_pages_key && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
                                         $site_pages_caching = $direction;
                                     }
-                                    if (!(strpos($match["condition"], $edit_pages_key) === false)) {
+                                    if ($match["name"] == "Request-Header" && $match["header_name"] == "Cookie" && $match["condition"] == "SESS" && $match["type"] == "0" && $match["operator"] == "NOT-CONTAIN") {
+                                        $excluded_sess_cookie = "set";
+                                    }
+                                    if ($match["condition"] == $edit_pages_key && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
                                         $edit_pages_caching = $direction;
                                     }
+                                    if ($match["condition"] == $configure_pages_key1 && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
+                                        $configure_pages_caching1 = $direction;
+                                    }
+                                    if ($match["condition"] == $configure_pages_key2 && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
+                                        $configure_pages_caching2 = $direction;
+                                    }
                                 }
+                            }
+                            if ($configure_pages_caching1 == "excluded" && $configure_pages_caching2 == "excluded") {
+                                $configure_pages_caching = "excluded";
+                            }
+                            if ($site_pages_caching == "unknown" || $excluded_sess_cookie != "set") {
+                                $site_pages_caching = "unknown";
+                                $excluded_sess_cookie = "unknown";
                             }
                         }
                     }
@@ -298,12 +303,9 @@ function post_processing_settings($json_output)
             }
         }
 
-        return array('prod_caching' => $prod_caching,
-                     'cat_caching' => $cat_caching,
-                     'ajax_cart_caching' => $ajax_cart_caching,
-                     'admin_caching' => $admin_caching,
-                     'site_pages_caching' => $site_pages_caching,
+        return array('site_pages_caching' => $site_pages_caching,
                      'edit_pages_caching' => $edit_pages_caching,
+                     'configure_pages_caching' => $configure_pages_caching,
                      'exclusions' => $exclusions);
     } else {
         return $json_output;
