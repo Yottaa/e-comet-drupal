@@ -36,9 +36,9 @@ function theme_yottaa_info($variables)
     }
 
     $contents .= '<h3>Links</h3>';
-    $contents .= '<div><a href="https://apps.yottaa.com/" target="_blank">Yottaa Dashboard</a><div>';
-    $contents .= '<div><a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/optimizer" target="_blank">Yottaa Site Overview</a><div>';
-    $contents .= '<div><a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings" target="_blank">Yottaa Optimization Configuration</a><div>';
+    $contents .= '<div><a href="https://apps.yottaa.com/" target="_blank">Yottaa Dashboard</a></div>';
+    $contents .= '<div><a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/optimizer" target="_blank">Yottaa Site Overview</a></div>';
+    $contents .= '<div><a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings" target="_blank">Yottaa Optimization Configuration</a></div>';
 
     $contents .= '<h3>Actions</h3>';
     if (!isset($json_output["error"])) {
