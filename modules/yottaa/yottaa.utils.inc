@@ -23,7 +23,8 @@ function parseHttpResponse($content = null)
     unset($hunks);
     unset($header);
     if (!validateHttpResponse($headers)) {
-        return false;
+        return '{"error" : ' . trim($body) . '}';
+        //return false;
     }
     if (in_array('Transfer-Coding: chunked', $headers)) {
         return trim(unchunkHttpResponse($body));
@@ -213,7 +214,7 @@ function flush_yottaa_cache()
     $yottaa_user_id = variable_get('yottaa_user_id', '');
     $yottaa_api_key = variable_get('yottaa_api_key', '');
     $yottaa_site_id = variable_get('yottaa_site_id', '');
-    $output = curl_post_async("https://api.yottaa.com/optimizers/" . $yottaa_site_id . "/flush_cache", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
+    $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id . "/flush_cache", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
     return json_decode(parseHttpResponse($output), true);
 }
 
