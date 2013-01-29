@@ -91,8 +91,8 @@ function theme_yottaa_info($variables)
             $contents .= '<span class="checklist-item-status checklist-item-status-passed">Passed</span></div>';
         } else {
             $contents .= '<span class="checklist-item-status checklist-item-status-failed">Failed</span></div>';
-            $contents .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exclude exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> with a "contains" expression of <strong>admin/configure</strong>.<div>';
-            $contents .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exclude exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> with a "contains" expression of <strong>admin%252Fconfig</strong>.<div>';
+            $contents .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exclude exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> with a "contains" expression of <strong>admin/</strong>.<div>';
+            $contents .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exclude exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> with a "contains" expression of <strong>admin%252F</strong>.<div>';
         }
         $contents .= '</div>';
         // Proxy mode

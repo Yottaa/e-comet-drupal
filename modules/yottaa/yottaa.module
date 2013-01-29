@@ -542,6 +542,7 @@ function yottaa_auto_clear_cache_form_submit($form, &$form_state)
  */
 function yottaa_node_update($node)
 {
+    watchdog('yottaa', 'Caught node update event for node @node.', array('@node' => $node->nid), WATCHDOG_DEBUG);
     auto_flush_yottaa_cache($node);
 }
 
@@ -551,6 +552,7 @@ function yottaa_node_update($node)
  */
 function yottaa_comment_update($comment)
 {
+    watchdog('yottaa', 'Caught comment update event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
     $node = node_load($comment->nid);
     auto_flush_yottaa_cache($node);
 }
@@ -561,6 +563,7 @@ function yottaa_comment_update($comment)
  */
 function yottaa_comment_insert($comment)
 {
+    watchdog('yottaa', 'Caught comment insert event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
     $node = node_load($comment->nid);
     auto_flush_yottaa_cache($node);
 }
@@ -571,6 +574,7 @@ function yottaa_comment_insert($comment)
  */
 function yottaa_comment_delete($comment)
 {
+    watchdog('yottaa', 'Caught comment delete event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
     $node = node_load($comment->nid);
     auto_flush_yottaa_cache($node);
 }

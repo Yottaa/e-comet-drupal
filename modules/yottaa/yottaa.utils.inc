@@ -230,8 +230,8 @@ function post_processing_settings($json_output)
     if (!isset($json_output["error"])) {
 
         $site_pages_key = "/";
-        $configure_pages_key1 = "admin/config";
-        $configure_pages_key2 = "admin%252Fconfig";
+        $configure_pages_key1 = "admin/";
+        $configure_pages_key2 = "admin%252F";
         $edit_pages_key = "/edit";
 
         $site_pages_caching = 'unknown';
@@ -329,7 +329,9 @@ function auto_flush_yottaa_cache($node)
         // drupal_set_message(t('Cache flushed!'));
         if (isset($json_output["error"])) {
             $error = $json_output["error"];
-            form_set_error('', 'Error received from flushing Yottaa cache:' . json_encode($error));
+            //form_set_error('', 'Error received from flushing Yottaa cache:' . json_encode($error));
+            watchdog('yottaa', 'Error received when flushing Yottaa cache for node @node. @error', array('@node' => $node->nid, '@error' => json_encode($error)), WATCHDOG_ERROR);
         }
+        watchdog('yottaa', 'Flushed Yottaa cache for node @node.', array('@node' => $node->nid), WATCHDOG_DEBUG);
     }
 }
