@@ -134,6 +134,20 @@ function yottaa_menu()
 }
 
 /**
+ * Implement hook_help()
+ */
+function yottaa_help($path, $arg)
+{
+    switch ($path) {
+        case 'admin/help#yottaa':
+            $output = '';
+            $output .= '<h3>' . t('About') . '</h3>';
+            $output .= '<p>' . t("Yottaa is an easy-to-use cloud service that brings speed, scale and security to any website. It accelerates your site for faster page loads, a better user experience and higher search engine rankings. It prevents your site from failing under heavy load or even attacks. It scales your web infrastructure to a global cloud network with over 20 locations. Further, Yottaa watches your site 24x7 and provides real time visibility into site problems. That’s what we mean by \"Optimize, Protect and Monitor.\"") . '<p>';
+            return $output;
+    }
+}
+
+/**
  * Prepare and generate entry form for new Yottaa account.
  */
 function yottaa_new_account()
@@ -578,6 +592,7 @@ function yottaa_comment_delete($comment)
     $node = node_load($comment->nid);
     auto_flush_yottaa_cache($node);
 }
+
 
 
 
