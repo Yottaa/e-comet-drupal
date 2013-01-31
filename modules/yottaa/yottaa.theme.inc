@@ -4,7 +4,8 @@ function theme_yottaa_info($variables)
 {
     // Render output
     drupal_add_css(drupal_get_path('module', 'yottaa') . '/css/yottaa.css');
-    $contents = '<h1>' . theme('image', array('path' => drupal_get_path('module', 'yottaa') . '/images/yottaa.png')) . '<strong>My Yottaa Page (Proxy IP: ' . $_SERVER['REMOTE_ADDR'] . '; Client IP:' . ip_address() . ')</strong></h1>';
+    //$contents = '<h1>' . theme('image', array('path' => drupal_get_path('module', 'yottaa') . '/images/yottaa.png')) . '<strong>My Yottaa Page (Proxy IP: ' . $_SERVER['REMOTE_ADDR'] . '; Client IP:' . ip_address() . ')</strong></h1>';
+    $contents = '<h1>' . theme('image', array('path' => drupal_get_path('module', 'yottaa') . '/images/yottaa.png')) . '<strong>My Yottaa Page</strong></h1>';
 
     $yottaa_site_id = variable_get('yottaa_site_id', '');
     $yottaa_user_id = variable_get('yottaa_user_id', '');
