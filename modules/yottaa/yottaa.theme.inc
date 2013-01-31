@@ -74,7 +74,8 @@ function theme_yottaa_info($variables)
             $contents .= '<span class="checklist-item-status checklist-item-status-passed">Passed</span></div>';
         } else {
             $contents .= '<span class="checklist-item-status checklist-item-status-failed">Failed</span></div>';
-            $contents .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> which includes resource from optimization if URI contains "/" and Request-Header whose name equals to "Cookie" and whose value doesen\'t contain "SESS" <div>';
+            //$contents .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> which includes resource from optimization if URI contains "/" and Request-Header whose name equals to "Cookie" and whose value doesen\'t contain "SESS" <div>';
+            $contents .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> which includes resource from optimization if URI contains "/".<div>';
         }
         $contents .= '</div>';
         // Edit pages

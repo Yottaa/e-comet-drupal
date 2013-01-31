@@ -275,7 +275,7 @@ function post_processing_settings($json_output)
                             if ($configure_pages_caching1 == "excluded" && $configure_pages_caching2 == "excluded") {
                                 $configure_pages_caching = "excluded";
                             }
-                            if ($site_pages_caching == "unknown" || $excluded_sess_cookie != "set") {
+                            if ($site_pages_caching == "unknown" /*|| $excluded_sess_cookie != "set"*/) {
                                 $site_pages_caching = "unknown";
                                 $excluded_sess_cookie = "unknown";
                             }
