@@ -15,29 +15,12 @@
  */
 function yottaa_boot()
 {
-
-    //$json_output = check_yottaa_status();
-    //$yottaa_status = $json_output["optimizer"];
-
-    //if (!isset($json_output["error"]) && $yottaa_status == 'live') {
-
-        /*
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-            $addrs = explode(",", $ip);
-            $_SERVER['PROXY_REMOTE_ADDR'] = $_SERVER['REMOTE_ADDR'];
-            $_SERVER['REMOTE_ADDR'] = trim($addrs[0]);
-        }
-        */
-
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $reverse_proxy_addresses = variable_get('reverse_proxy_addresses', array());
-            $reverse_proxy_addresses[] = $_SERVER['REMOTE_ADDR'];
-            variable_set('reverse_proxy', 1);
-            variable_set('reverse_proxy_addresses', $reverse_proxy_addresses );
-        }
-
-    //}
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $reverse_proxy_addresses = variable_get('reverse_proxy_addresses', array());
+        $reverse_proxy_addresses[] = $_SERVER['REMOTE_ADDR'];
+        variable_set('reverse_proxy', 1);
+        variable_set('reverse_proxy_addresses', $reverse_proxy_addresses);
+    }
 }
 
 /**
@@ -281,37 +264,17 @@ function yottaa_admin_settings()
  */
 function yottaa_admin_settings_validate($form, &$form_state)
 {
+    $yottaa_user_id = $form_state['values']['yottaa_user_id'];
+    $yottaa_api_key = $form_state['values']['yottaa_api_key'];
+    $yottaa_site_id = $form_state['values']['yottaa_site_id'];
 
-    // user id is required
-
-    /*
-    $user_id = $form_state['values']['yottaa_user_id'];
-    if ($user_id == '') {
-        form_set_error('yottaa_user_id', t('You must specify the Yottaa User Id.'));
+    if ($yottaa_user_id != '' && $yottaa_api_key != '' && $yottaa_site_id != '') {
+        $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id, array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
+        $json_output = json_decode(parseHttpResponse($output), true);
+        if ($json_output == null || isset($json_output["error"]) || isset($json_output["error_response"])) {
+            form_set_error('', t('Could not authenticate with Yottaa.'));
+        }
     }
-
-    // api key is required
-    $api_key = $form_state['values']['yottaa_api_key'];
-    if ($api_key == '') {
-        form_set_error('yottaa_api_key', t('You must specify the Yottaa API Key.'));
-    }
-
-    // site id is required
-    $site_id = $form_state['values']['yottaa_site_id'];
-    if ($site_id == '') {
-        form_set_error('yottaa_site_id', t('You must specify the Yottaa Site Id.'));
-    }
-    */
-
-    // attempt to authenticate
-    /*
-    if (yottaa_utils_get_ticket() == '') {
-        form_set_error('', t('Could not authenticate with userid.'));
-    } else {
-        drupal_set_message('Yottaa Repo Info:<br/>' . yottaa_info());
-    }
-    */
-
 }
 
 /**

@@ -119,15 +119,9 @@ function theme_yottaa_info($variables)
  */
 function theme_yottaa_optimizer_activate_form($variables)
 {
-    $form = $variables['form'];
-
     $yottaa_site_id = variable_get('yottaa_site_id', '');
     $active_link = '<a class="button" href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '" target="_blank"> Activate Optimizations</a>';
-
-    //$rows = array(array(drupal_render($form['submit']),t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
     $rows = array(array(t($active_link), t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
-
-    //return theme('table', array('rows' => $rows)) . drupal_render_children($form);
     return theme('table', array('rows' => $rows));
 }
 
@@ -139,9 +133,7 @@ function theme_yottaa_optimizer_activate_form($variables)
 function theme_yottaa_optimizer_pause_form($variables)
 {
     $form = $variables['form'];
-
     $rows = array(array(drupal_render($form['submit']), t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
-
     return theme('table', array('rows' => $rows)) . drupal_render_children($form);
 }
 
@@ -153,9 +145,7 @@ function theme_yottaa_optimizer_pause_form($variables)
 function theme_yottaa_optimizer_resume_form($variables)
 {
     $form = $variables['form'];
-
     $rows = array(array(drupal_render($form['submit']), t('Starting optimization will apply optimizations on your website within 5minutes.')));
-
     return theme('table', array('rows' => $rows)) . drupal_render_children($form);
 }
 
@@ -167,9 +157,7 @@ function theme_yottaa_optimizer_resume_form($variables)
 function theme_yottaa_clear_cache_form($variables)
 {
     $form = $variables['form'];
-
     $rows = array(array(drupal_render($form['submit']), t('Clearing the cache will remove all of your sites resources from our CDN. Use this option if you have updated a resource (gif, css, JavaScript).')));
-
     return theme('table', array('rows' => $rows)) . drupal_render_children($form);
 }
 
@@ -181,8 +169,6 @@ function theme_yottaa_clear_cache_form($variables)
 function theme_yottaa_auto_clear_cache_form($variables)
 {
     $form = $variables['form'];
-
     $rows = array(array(drupal_render($form['submit'])));
-
     return drupal_render_children($form) . theme('table', array('rows' => $rows));
 }
