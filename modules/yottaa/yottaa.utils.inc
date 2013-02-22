@@ -235,6 +235,7 @@ function post_processing_settings($json_output)
         $edit_pages_key = "/edit";
 
         $site_pages_caching = 'unknown';
+        $logged_in_pages_caching = 'unknown';
         $edit_pages_caching = 'unknown';
         $configure_pages_caching = 'unknown';
         $configure_pages_caching1 = 'unknown';
@@ -247,6 +248,9 @@ function post_processing_settings($json_output)
         if (isset($json_output["defaultActions"]) && isset($json_output["defaultActions"]["resourceActions"]) && isset($json_output["defaultActions"]["resourceActions"]["htmlCache"])) {
             $html_cachings = $json_output["defaultActions"]["resourceActions"]["htmlCache"];
             foreach ($html_cachings as &$html_caching) {
+                if ($html_caching["enabled"]) {
+                    $site_pages_caching = 'included';
+                }
                 if (isset($html_caching["filters"])) {
                     $filters = $html_caching["filters"];
                     foreach ($filters as &$filter) {
@@ -256,7 +260,7 @@ function post_processing_settings($json_output)
                             foreach ($matches as &$match) {
                                 if (isset($match["condition"])) {
                                     if ($match["condition"] == $site_pages_key && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
-                                        $site_pages_caching = $direction;
+                                        $logged_in_pages_caching = $direction;
                                     }
                                     if ($match["name"] == "Request-Header" && $match["header_name"] == "Cookie" && $match["condition"] == "SESS" && $match["type"] == "0" && $match["operator"] == "NOT-CONTAIN") {
                                         $excluded_sess_cookie = "set";
@@ -275,8 +279,8 @@ function post_processing_settings($json_output)
                             if ($configure_pages_caching1 == "excluded" && $configure_pages_caching2 == "excluded") {
                                 $configure_pages_caching = "excluded";
                             }
-                            if ($site_pages_caching == "unknown" /*|| $excluded_sess_cookie != "set"*/) {
-                                $site_pages_caching = "unknown";
+                            if ($logged_in_pages_caching == "unknown" || $excluded_sess_cookie != "set") {
+                                $logged_in_pages_caching = "unknown";
                                 $excluded_sess_cookie = "unknown";
                             }
                         }
@@ -307,6 +311,7 @@ function post_processing_settings($json_output)
         return array('site_pages_caching' => $site_pages_caching,
                      'edit_pages_caching' => $edit_pages_caching,
                      'configure_pages_caching' => $configure_pages_caching,
+                     'excluded_sess_cookie' => $excluded_sess_cookie,
                      'exclusions' => $exclusions);
     } else {
         return $json_output;
