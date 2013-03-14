@@ -202,6 +202,7 @@ function yottaa_new_account_submit($form, &$form_state)
         $preview_url = $json_output["preview_url"];
 
         drupal_set_message(t('New account form has been created with preview url <a href="') . $preview_url . '">' . $preview_url . '</a>');
+        drupal_set_message(t('Your Yottaa login information has been sent to your email address ') . $user_email . '.');
         //drupal_set_message(t('Return is -> ' . json_encode($json_output)));
 
         variable_set('yottaa_user_id', $user_id);
