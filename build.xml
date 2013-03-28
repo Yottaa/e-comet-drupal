@@ -21,24 +21,32 @@
 
     <property name="drupal.module.package.file.tar.gz" value="${build.dir}/${drupal.module.id}.tar.gz"/>
 
+    <property name="drupal.module.v6.id" value="yottaa-6.x-1.0"/>
+    <property name="drupal.module.v6.package.file.tar.gz" value="${build.dir}/${drupal.module.v6.id}.tar.gz"/>
+
     <target name="clean">
         <delete>
             <fileset dir="${build.dir}" includes="**/*"/>
         </delete>
     </target>
 
-    <target name="package-drupal-module" description="Packages Drupal module">
+    <target name="package-drupal-module" description="Packages Drupal module" depends="clean">
         <echo>Packaging ${drupal.module.title} Module file</echo>
         <tar destfile="${drupal.module.package.file.tar.gz}" compression="gzip">
             <tarfileset dir="${drupal.dir}/yottaa" prefix="yottaa"/>
+        </tar>
+        <echo>Packaging ${drupal.module.title} Module file</echo>
+        <tar destfile="${drupal.module.v6.package.file.tar.gz}" compression="gzip">
+            <tarfileset dir="${drupal.dir}/yottaa" prefix="yottaa"/>
+            <tarfileset dir="${drupal.dir}/drupal-6/yottaa" prefix="yottaa"/>
         </tar>
     </target>
 
     <target name="package" depends="package-drupal-module"/>
 
     <target name="dev">
-        <copy todir="${drupal.location}/sites/all/modules" verbose="true">
-            <fileset dir="${drupal.dir}"/>
+        <copy todir="${drupal.location}/sites/all/modules//${yottaa.module.id}" verbose="true">
+            <fileset dir="${drupal.dir}/${yottaa.module.id}"/>
         </copy>
     </target>
 
@@ -58,6 +66,31 @@
              verbose="true"
              failonerror="true">
             <fileset dir="${drupal.dir}/yottaa">
+                <include name="**/*"/>
+            </fileset>
+        </scp>
+    </target>
+
+    <!--  drupal.pageloadtest.org  -->
+    <target name="unpublish1">
+        <sshexec host="23.20.15.127"
+                 username="yadmin"
+                 password="yottaarific123"
+                 trust="true"
+                 command="rm -r /home/yadmin/${yottaa.module.id}/*"
+                 failonerror="false"/>
+    </target>
+
+    <target name="publish1" depends="unpublish1">
+        <scp todir="yadmin@23.20.15.127:/home/yadmin/${yottaa.module.id}"
+             password="yottaarific123"
+             trust="true"
+             verbose="true"
+             failonerror="true">
+            <fileset dir="${drupal.dir}/yottaa">
+                <include name="**/*"/>
+            </fileset>
+            <fileset dir="${drupal.dir}/drupal-6/yottaa">
                 <include name="**/*"/>
             </fileset>
         </scp>

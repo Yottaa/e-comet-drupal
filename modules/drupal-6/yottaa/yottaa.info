@@ -1,0 +1,6 @@
+name = Yottaa
+description = Provides Yottaa/Drupal integration.
+package = Web Performance
+core = 6.x
+version = 6.x-1.0
+configure = admin/config/system/yottaa

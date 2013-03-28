@@ -9,28 +9,28 @@
  */
 function parseHttpResponse($content = null)
 {
-    if (empty($content)) {
-        return false;
-    }
-    // split into array, headers and content.
-    $hunks = explode("\r\n\r\n", trim($content));
-    if (!is_array($hunks) or count($hunks) < 2) {
-        return false;
-    }
-    $header = $hunks[count($hunks) - 2];
-    $body = $hunks[count($hunks) - 1];
-    $headers = explode("\n", $header);
-    unset($hunks);
-    unset($header);
-    if (!validateHttpResponse($headers)) {
-        return '{"error" : ' . trim($body) . '}';
-        //return false;
-    }
-    if (in_array('Transfer-Coding: chunked', $headers)) {
-        return trim(unchunkHttpResponse($body));
-    } else {
-        return trim($body);
-    }
+  if (empty($content)) {
+    return false;
+  }
+  // split into array, headers and content.
+  $hunks = explode("\r\n\r\n", trim($content));
+  if (!is_array($hunks) or count($hunks) < 2) {
+    return false;
+  }
+  $header = $hunks[count($hunks) - 2];
+  $body = $hunks[count($hunks) - 1];
+  $headers = explode("\n", $header);
+  unset($hunks);
+  unset($header);
+  if (!validateHttpResponse($headers)) {
+    return '{"error" : ' . trim($body) . '}';
+    //return false;
+  }
+  if (in_array('Transfer-Coding: chunked', $headers)) {
+    return trim(unchunkHttpResponse($body));
+  } else {
+    return trim($body);
+  }
 }
 
 /**
@@ -42,18 +42,18 @@ function parseHttpResponse($content = null)
  */
 function validateHttpResponse($headers = null)
 {
-    if (!is_array($headers) or count($headers) < 1) {
-        return false;
-    }
-    switch (trim(strtolower($headers[0]))) {
-        case 'http/1.0 100 ok':
-        case 'http/1.0 200 ok':
-        case 'http/1.1 100 ok':
-        case 'http/1.1 200 ok':
-            return true;
-            break;
-    }
+  if (!is_array($headers) or count($headers) < 1) {
     return false;
+  }
+  switch (trim(strtolower($headers[0]))) {
+    case 'http/1.0 100 ok':
+    case 'http/1.0 200 ok':
+    case 'http/1.1 100 ok':
+    case 'http/1.1 200 ok':
+      return true;
+      break;
+  }
+  return false;
 }
 
 /**
@@ -66,29 +66,29 @@ function validateHttpResponse($headers = null)
  */
 function unchunkHttpResponse($str = null)
 {
-    if (!is_string($str) or strlen($str) < 1) {
-        return false;
+  if (!is_string($str) or strlen($str) < 1) {
+    return false;
+  }
+  $eol = "\r\n";
+  $add = strlen($eol);
+  $tmp = $str;
+  $str = '';
+  do {
+    $tmp = ltrim($tmp);
+    $pos = strpos($tmp, $eol);
+    if ($pos === false) {
+      return false;
     }
-    $eol = "\r\n";
-    $add = strlen($eol);
-    $tmp = $str;
-    $str = '';
-    do {
-        $tmp = ltrim($tmp);
-        $pos = strpos($tmp, $eol);
-        if ($pos === false) {
-            return false;
-        }
-        $len = hexdec(substr($tmp, 0, $pos));
-        if (!is_numeric($len) or $len < 0) {
-            return false;
-        }
-        $str .= substr($tmp, ($pos + $add), $len);
-        $tmp = substr($tmp, ($len + $pos + $add));
-        $check = trim($tmp);
-    } while (!empty($check));
-    unset($tmp);
-    return $str;
+    $len = hexdec(substr($tmp, 0, $pos));
+    if (!is_numeric($len) or $len < 0) {
+      return false;
+    }
+    $str .= substr($tmp, ($pos + $add), $len);
+    $tmp = substr($tmp, ($len + $pos + $add));
+    $check = trim($tmp);
+  } while (!empty($check));
+  unset($tmp);
+  return $str;
 }
 
 /**
@@ -99,35 +99,35 @@ function unchunkHttpResponse($str = null)
  */
 function curl_post_async($url, $params, $method, $api_key)
 {
-    foreach ($params as $key => &$val) {
-        if (is_array($val)) $val = implode(',', $val);
-        $post_params[] = $key . '=' . urlencode($val);
-    }
-    $post_string = implode('&', $post_params);
+  foreach ($params as $key => &$val) {
+    if (is_array($val)) $val = implode(',', $val);
+    $post_params[] = $key . '=' . urlencode($val);
+  }
+  $post_string = implode('&', $post_params);
 
-    $parts = parse_url($url);
+  $parts = parse_url($url);
 
-    $fp = fsockopen("ssl://" . $parts['host'],
-                    isset($parts['port']) ? $parts['port'] : 443,
-                    $errno, $errstr, 30);
+  $fp = fsockopen("ssl://" . $parts['host'],
+          isset($parts['port']) ? $parts['port'] : 443,
+          $errno, $errstr, 30);
 
-    // Data goes in the path for a GET request
-    $parts['path'] .= '?' . $post_string;
+  // Data goes in the path for a GET request
+  $parts['path'] .= '?' . $post_string;
 
-    $out = $method . " " . $parts['path'] . " HTTP/1.1\r\n";
-    $out .= "Host: " . $parts['host'] . "\r\n";
-    $out .= "Content-Type: application/x-www-form-urlencoded\r\n";
-    $out .= "Content-Length: 0\r\n";
-    $out .= "YOTTAA-API-KEY: " . $api_key . "\r\n";
-    $out .= "Connection: Close\r\n\r\n";
+  $out = $method . " " . $parts['path'] . " HTTP/1.1\r\n";
+  $out .= "Host: " . $parts['host'] . "\r\n";
+  $out .= "Content-Type: application/x-www-form-urlencoded\r\n";
+  $out .= "Content-Length: 0\r\n";
+  $out .= "YOTTAA-API-KEY: " . $api_key . "\r\n";
+  $out .= "Connection: Close\r\n\r\n";
 
-    fwrite($fp, $out);
-    $result = "";
-    while (!feof($fp)) {
-        $result .= fgets($fp, 128);
-    }
-    fclose($fp);
-    return $result;
+  fwrite($fp, $out);
+  $result = "";
+  while (!feof($fp)) {
+    $result .= fgets($fp, 128);
+  }
+  fclose($fp);
+  return $result;
 }
 
 /**
@@ -139,13 +139,13 @@ function curl_post_async($url, $params, $method, $api_key)
  * @param $site
  * @return mixed
  */
-function create_yottaa_account($full_name, $email, $phone, $site)
+function yottaa_create_yottaa_account($full_name, $email, $phone, $site)
 {
-    $user_id = '4d34f75b74b1553ba500007f';
-    $api_key = '455df7500258012f663b12313d145ceb';
-    list($first_name, $last_name) = explode(" ", $full_name);
-    $output = curl_post_async("https://api.yottaa.com/partners/" . $user_id . "/accounts", array("first_name" => $first_name, "last_name" => $last_name, "email" => $email, "phone" => $phone, "site" => $site), "POST", $api_key);
-    return json_decode(parseHttpResponse($output), true);
+  $user_id = '4d34f75b74b1553ba500007f';
+  $api_key = '455df7500258012f663b12313d145ceb';
+  list($first_name, $last_name) = explode(" ", $full_name);
+  $output = curl_post_async("https://api.yottaa.com/partners/" . $user_id . "/accounts", array("first_name" => $first_name, "last_name" => $last_name, "email" => $email, "phone" => $phone, "site" => $site), "POST", $api_key);
+  return json_decode(parseHttpResponse($output), true);
 }
 
 /**
@@ -153,13 +153,13 @@ function create_yottaa_account($full_name, $email, $phone, $site)
  *
  * @return mixed
  */
-function check_yottaa_status()
+function yottaa_check_yottaa_status()
 {
-    $yottaa_user_id = variable_get('yottaa_user_id', '');
-    $yottaa_api_key = variable_get('yottaa_api_key', '');
-    $yottaa_site_id = variable_get('yottaa_site_id', '');
-    $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id, array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
-    return json_decode(parseHttpResponse($output), true);
+  $yottaa_user_id = variable_get('yottaa_user_id', '');
+  $yottaa_api_key = variable_get('yottaa_api_key', '');
+  $yottaa_site_id = variable_get('yottaa_site_id', '');
+  $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id, array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
+  return json_decode(parseHttpResponse($output), true);
 }
 
 /**
@@ -167,13 +167,13 @@ function check_yottaa_status()
  *
  * @return mixed
  */
-function resume_yottaa_optimizer()
+function yottaa_resume_yottaa_optimizer()
 {
-    $yottaa_user_id = variable_get('yottaa_user_id', '');
-    $yottaa_api_key = variable_get('yottaa_api_key', '');
-    $yottaa_site_id = variable_get('yottaa_site_id', '');
-    $output = curl_post_async("https://api.yottaa.com/optimizers/" . $yottaa_site_id . "/resume", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
-    return json_decode(parseHttpResponse($output), true);
+  $yottaa_user_id = variable_get('yottaa_user_id', '');
+  $yottaa_api_key = variable_get('yottaa_api_key', '');
+  $yottaa_site_id = variable_get('yottaa_site_id', '');
+  $output = curl_post_async("https://api.yottaa.com/optimizers/" . $yottaa_site_id . "/resume", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
+  return json_decode(parseHttpResponse($output), true);
 }
 
 /**
@@ -181,13 +181,13 @@ function resume_yottaa_optimizer()
  *
  * @return mixed
  */
-function pause_yottaa_optimizer()
+function yottaa_pause_yottaa_optimizer()
 {
-    $yottaa_user_id = variable_get('yottaa_user_id', '');
-    $yottaa_api_key = variable_get('yottaa_api_key', '');
-    $yottaa_site_id = variable_get('yottaa_site_id', '');
-    $output = curl_post_async("https://api.yottaa.com/optimizers/" . $yottaa_site_id . "/pause", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
-    return json_decode(parseHttpResponse($output), true);
+  $yottaa_user_id = variable_get('yottaa_user_id', '');
+  $yottaa_api_key = variable_get('yottaa_api_key', '');
+  $yottaa_site_id = variable_get('yottaa_site_id', '');
+  $output = curl_post_async("https://api.yottaa.com/optimizers/" . $yottaa_site_id . "/pause", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
+  return json_decode(parseHttpResponse($output), true);
 }
 
 /**
@@ -195,13 +195,13 @@ function pause_yottaa_optimizer()
  *
  * @return mixed
  */
-function retrieve_yottaa_settings()
+function yottaa_retrieve_yottaa_settings()
 {
-    $yottaa_user_id = variable_get('yottaa_user_id', '');
-    $yottaa_api_key = variable_get('yottaa_api_key', '');
-    $yottaa_site_id = variable_get('yottaa_site_id', '');
-    $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id . "/settings", array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
-    return post_processing_settings(json_decode(parseHttpResponse($output), true));
+  $yottaa_user_id = variable_get('yottaa_user_id', '');
+  $yottaa_api_key = variable_get('yottaa_api_key', '');
+  $yottaa_site_id = variable_get('yottaa_site_id', '');
+  $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id . "/settings", array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
+  return post_processing_settings(json_decode(parseHttpResponse($output), true));
 }
 
 /**
@@ -209,13 +209,13 @@ function retrieve_yottaa_settings()
  *
  * @return mixed
  */
-function flush_yottaa_cache()
+function yottaa_flush_yottaa_cache()
 {
-    $yottaa_user_id = variable_get('yottaa_user_id', '');
-    $yottaa_api_key = variable_get('yottaa_api_key', '');
-    $yottaa_site_id = variable_get('yottaa_site_id', '');
-    $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id . "/flush_cache", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
-    return json_decode(parseHttpResponse($output), true);
+  $yottaa_user_id = variable_get('yottaa_user_id', '');
+  $yottaa_api_key = variable_get('yottaa_api_key', '');
+  $yottaa_site_id = variable_get('yottaa_site_id', '');
+  $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id . "/flush_cache", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
+  return json_decode(parseHttpResponse($output), true);
 }
 
 
@@ -227,95 +227,95 @@ function flush_yottaa_cache()
  */
 function post_processing_settings($json_output)
 {
-    if (!isset($json_output["error"])) {
+  if (!isset($json_output["error"])) {
 
-        $site_pages_key = "/";
-        $configure_pages_key1 = "admin/";
-        $configure_pages_key2 = "admin%252F";
-        $edit_pages_key = "/edit";
+    $site_pages_key = "/";
+    $configure_pages_key1 = "admin/";
+    $configure_pages_key2 = "admin%252F";
+    $edit_pages_key = "/edit";
 
-        $site_pages_caching = 'unknown';
-        $only_cache_anonymous_users = 'unknown';
-        $edit_pages_caching = 'unknown';
-        $configure_pages_caching = 'unknown';
-        $configure_pages_caching1 = 'unknown';
-        $configure_pages_caching2 = 'unknown';
+    $site_pages_caching = 'unknown';
+    $only_cache_anonymous_users = 'unknown';
+    $edit_pages_caching = 'unknown';
+    $configure_pages_caching = 'unknown';
+    $configure_pages_caching1 = 'unknown';
+    $configure_pages_caching2 = 'unknown';
 
-        $exclusions = '';
+    $exclusions = '';
 
-        $excluded_sess_cookie = 'unknown';
+    $excluded_sess_cookie = 'unknown';
 
-        if (isset($json_output["defaultActions"]) && isset($json_output["defaultActions"]["resourceActions"]) && isset($json_output["defaultActions"]["resourceActions"]["htmlCache"])) {
-            $html_cachings = $json_output["defaultActions"]["resourceActions"]["htmlCache"];
-            foreach ($html_cachings as &$html_caching) {
-                if ($html_caching["enabled"]) {
-                    $site_pages_caching = 'included';
-                }
-                if (isset($html_caching["filters"])) {
-                    $filters = $html_caching["filters"];
-                    foreach ($filters as &$filter) {
-                        if (isset($filter["match"])) {
-                            $direction = $filter["direction"] == 1 ? "included" : "excluded";
-                            $matches = $filter["match"];
-                            foreach ($matches as &$match) {
-                                if (isset($match["condition"])) {
-                                    if ($match["condition"] == $site_pages_key && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
-                                        $only_cache_anonymous_users = $direction;
-                                    }
-                                    if ($match["name"] == "Request-Header" && $match["header_name"] == "Cookie" && $match["condition"] == "SESS" && $match["type"] == "0" && $match["operator"] == "NOT-CONTAIN") {
-                                        $excluded_sess_cookie = "set";
-                                    }
-                                    if ($match["condition"] == $edit_pages_key && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
-                                        $edit_pages_caching = $direction;
-                                    }
-                                    if ($match["condition"] == $configure_pages_key1 && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
-                                        $configure_pages_caching1 = $direction;
-                                    }
-                                    if ($match["condition"] == $configure_pages_key2 && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
-                                        $configure_pages_caching2 = $direction;
-                                    }
-                                }
-                            }
-                            if ($configure_pages_caching1 == "excluded" && $configure_pages_caching2 == "excluded") {
-                                $configure_pages_caching = "excluded";
-                            }
-                            if ($only_cache_anonymous_users == "unknown" || $excluded_sess_cookie != "set") {
-                                $only_cache_anonymous_users = "unknown";
-                                $excluded_sess_cookie = "unknown";
-                            }
-                        }
-                    }
-                }
-            }
+    if (isset($json_output["defaultActions"]) && isset($json_output["defaultActions"]["resourceActions"]) && isset($json_output["defaultActions"]["resourceActions"]["htmlCache"])) {
+      $html_cachings = $json_output["defaultActions"]["resourceActions"]["htmlCache"];
+      foreach ($html_cachings as &$html_caching) {
+        if ($html_caching["enabled"]) {
+          $site_pages_caching = 'included';
         }
-
-        if (isset($json_output["defaultActions"]) && isset($json_output["defaultActions"]["filters"])) {
-            $filters = $json_output["defaultActions"]["filters"];
-            foreach ($filters as &$filter) {
-                if (isset($filter["match"])) {
-                    if ($filter["direction"] == 0) {
-                        $matches = $filter["match"];
-                        foreach ($matches as &$match) {
-                            if (isset($match["condition"])) {
-                                if ($exclusions != '') {
-                                    $exclusions = $exclusions . ' ; ';
-                                }
-                                $exclusions = $exclusions . $match["condition"];
-                            }
-                        }
-                    }
+        if (isset($html_caching["filters"])) {
+          $filters = $html_caching["filters"];
+          foreach ($filters as &$filter) {
+            if (isset($filter["match"])) {
+              $direction = $filter["direction"] == 1 ? "included" : "excluded";
+              $matches = $filter["match"];
+              foreach ($matches as &$match) {
+                if (isset($match["condition"])) {
+                  if ($match["condition"] == $site_pages_key && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
+                    $only_cache_anonymous_users = $direction;
+                  }
+                  if ($match["name"] == "Request-Header" && $match["header_name"] == "Cookie" && $match["condition"] == "SESS" && $match["type"] == "0" && $match["operator"] == "NOT-CONTAIN") {
+                    $excluded_sess_cookie = "set";
+                  }
+                  if ($match["condition"] == $edit_pages_key && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
+                    $edit_pages_caching = $direction;
+                  }
+                  if ($match["condition"] == $configure_pages_key1 && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
+                    $configure_pages_caching1 = $direction;
+                  }
+                  if ($match["condition"] == $configure_pages_key2 && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
+                    $configure_pages_caching2 = $direction;
+                  }
                 }
+              }
+              if ($configure_pages_caching1 == "excluded" && $configure_pages_caching2 == "excluded") {
+                $configure_pages_caching = "excluded";
+              }
+              if ($only_cache_anonymous_users == "unknown" || $excluded_sess_cookie != "set") {
+                $only_cache_anonymous_users = "unknown";
+                $excluded_sess_cookie = "unknown";
+              }
             }
+          }
         }
-
-        return array('site_pages_caching' => $site_pages_caching,
-                     'edit_pages_caching' => $edit_pages_caching,
-                     'configure_pages_caching' => $configure_pages_caching,
-                     'only_cache_anonymous_users' => $only_cache_anonymous_users,
-                     'exclusions' => $exclusions);
-    } else {
-        return $json_output;
+      }
     }
+
+    if (isset($json_output["defaultActions"]) && isset($json_output["defaultActions"]["filters"])) {
+      $filters = $json_output["defaultActions"]["filters"];
+      foreach ($filters as &$filter) {
+        if (isset($filter["match"])) {
+          if ($filter["direction"] == 0) {
+            $matches = $filter["match"];
+            foreach ($matches as &$match) {
+              if (isset($match["condition"])) {
+                if ($exclusions != '') {
+                  $exclusions = $exclusions . ' ; ';
+                }
+                $exclusions = $exclusions . $match["condition"];
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return array('site_pages_caching' => $site_pages_caching,
+           'edit_pages_caching' => $edit_pages_caching,
+           'configure_pages_caching' => $configure_pages_caching,
+           'only_cache_anonymous_users' => $only_cache_anonymous_users,
+           'exclusions' => $exclusions);
+  } else {
+    return $json_output;
+  }
 }
 
 /**
@@ -326,17 +326,17 @@ function post_processing_settings($json_output)
  * @param $node
  * @return void
  */
-function auto_flush_yottaa_cache($node)
+function yottaa_auto_flush_yottaa_cache($node)
 {
-    $yottaa_auto_clear_cache = variable_get('yottaa_auto_clear_cache', 1);
-    if ($yottaa_auto_clear_cache == 1) {
-        $json_output = flush_yottaa_cache();
-        // drupal_set_message(t('Cache flushed!'));
-        if (isset($json_output["error"])) {
-            $error = $json_output["error"];
-            //form_set_error('', 'Error received from flushing Yottaa cache:' . json_encode($error));
-            watchdog('yottaa', 'Error received when flushing Yottaa cache for node @node. @error', array('@node' => $node->nid, '@error' => json_encode($error)), WATCHDOG_ERROR);
-        }
-        watchdog('yottaa', 'Flushed Yottaa cache for node @node.', array('@node' => $node->nid), WATCHDOG_DEBUG);
+  $yottaa_auto_clear_cache = variable_get('yottaa_auto_clear_cache', 1);
+  if ($yottaa_auto_clear_cache == 1) {
+    $json_output = flush_yottaa_cache();
+    // drupal_set_message(t('Cache flushed!'));
+    if (isset($json_output["error"])) {
+      $error = $json_output["error"];
+      //form_set_error('', 'Error received from flushing Yottaa cache:' . json_encode($error));
+      watchdog('yottaa', 'Error received when flushing Yottaa cache for node @node. @error', array('@node' => $node->nid, '@error' => json_encode($error)), WATCHDOG_ERROR);
     }
+    watchdog('yottaa', 'Flushed Yottaa cache for node @node.', array('@node' => $node->nid), WATCHDOG_DEBUG);
+  }
 }
