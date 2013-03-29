@@ -39,7 +39,7 @@ function yottaa_menu() {
       'description' => 'Manage settings of Yottaa site optimizer.',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('yottaa_new_account'),
-      'access callback' => 'user_access',
+      'access callback' => 'yottaa_user_access',
       'access arguments' => array('administer yottaa'),
       'type' => MENU_NORMAL_ITEM,
       'weight' => 1
@@ -49,7 +49,7 @@ function yottaa_menu() {
       'title' => 'New Yottaa Account',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('yottaa_new_account'),
-      'access callback' => 'user_access',
+      'access callback' => 'yottaa_user_access',
       'access arguments' => array('administer yottaa'),
       'type' => MENU_DEFAULT_LOCAL_TASK,
       'weight' => 2
@@ -59,7 +59,7 @@ function yottaa_menu() {
       'title' => 'Existing Yottaa Account',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('yottaa_admin_settings'),
-      'access callback' => 'user_access',
+      'access callback' => 'yottaa_user_access',
       'access arguments' => array('administer yottaa'),
       'type' => MENU_LOCAL_TASK,
       'weight' => 3
@@ -71,7 +71,7 @@ function yottaa_menu() {
       'title' => 'Yottaa',
       'description' => 'Manage settings of Yottaa site optimizer.',
       'page callback' => 'yottaa_info',
-      'access callback' => 'user_access',
+      'access callback' => 'yottaa_user_access',
       'access arguments' => array('administer yottaa'),
       'type' => MENU_NORMAL_ITEM,
       'weight' => 1
@@ -80,7 +80,7 @@ function yottaa_menu() {
     $items['admin/config/system/yottaa/info'] = array(
       'title' => 'Yottaa Info',
       'page callback' => 'yottaa_info',
-      'access callback' => 'user_access',
+      'access callback' => 'yottaa_user_access',
       'access arguments' => array('administer yottaa'),
       'type' => MENU_DEFAULT_LOCAL_TASK,
       'weight' => 2
@@ -90,7 +90,7 @@ function yottaa_menu() {
       'title' => 'Advanced Configuration',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('yottaa_admin_settings'),
-      'access callback' => 'user_access',
+      'access callback' => 'yottaa_user_access',
       'access arguments' => array('administer yottaa'),
       'type' => MENU_LOCAL_TASK,
       'weight' => 3
@@ -242,6 +242,13 @@ function yottaa_admin_settings() {
 }
 
 /**
+ * @return
+ */
+function yottaa_user_access() {
+  return user_access('administer yottaa');
+}
+
+/**
  * Validate Setting inputs for Yottaa
  */
 function yottaa_admin_settings_validate($form, &$form_state) {
@@ -251,7 +258,7 @@ function yottaa_admin_settings_validate($form, &$form_state) {
 
   if ($yottaa_user_id != '' && $yottaa_api_key != '' && $yottaa_site_id != '') {
     $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id, array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
-    $json_output = json_decode(parseHttpResponse($output), TRUE);
+    $json_output = json_decode(parse_http_response($output), TRUE);
     if ($json_output == NULL || isset($json_output["error"]) || isset($json_output["error_response"])) {
       form_set_error('', t('Could not authenticate with Yottaa.'));
     }
@@ -268,8 +275,15 @@ function yottaa_admin_settings_submit($form, &$form_state) {
 /**
  * Return permissions for the Yottaa module.
  */
+
 function yottaa_permission() {
-  $perms = array('administer yottaa', 'access yottaa');
+  $perms = array(
+    'administer yottaa'=> array(
+      'title' => t('Administer Yottaa'),
+      'description' => t('Allows users to administer Yottaa.'),
+      'restrict access' => TRUE
+    )
+  );
   return $perms;
 }
 
@@ -279,31 +293,25 @@ function yottaa_permission() {
 function yottaa_theme($existing, $type, $theme, $path) {
   return array(
     'yottaa_info' => array(
-      'variables' => array('context' => NULL),
       'file' => 'yottaa.theme.inc'
     ),
     'yottaa_optimizer_activate_form' => array(
-      'variables' => array('form' => NULL),
       'file' => 'yottaa.theme.inc',
       'render element' => 'form',
     ),
     'yottaa_optimizer_pause_form' => array(
-      'variables' => array('form' => NULL),
       'file' => 'yottaa.theme.inc',
       'render element' => 'form',
     ),
     'yottaa_optimizer_resume_form' => array(
-      'variables' => array('form' => NULL),
       'file' => 'yottaa.theme.inc',
       'render element' => 'form',
     ),
     'yottaa_clear_cache_form' => array(
-      'variables' => array('form' => NULL),
       'file' => 'yottaa.theme.inc',
       'render element' => 'form',
     ),
     'yottaa_auto_clear_cache_form' => array(
-      'variables' => array('form' => NULL),
       'file' => 'yottaa.theme.inc',
       'render element' => 'form',
     )
