@@ -1,5 +1,6 @@
 <?php
 /**
+ * @file
  * Yottaa Module
  *
  * @author Yong Qu
@@ -10,25 +11,10 @@
  */
 
 /**
- * Implementation of hook_boot() for Yottaa module.
- *
- */
-function yottaa_boot()
-{
-  if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-    $reverse_proxy_addresses = variable_get('reverse_proxy_addresses', array());
-    $reverse_proxy_addresses[] = $_SERVER['REMOTE_ADDR'];
-    variable_set('reverse_proxy', 1);
-    variable_set('reverse_proxy_addresses', $reverse_proxy_addresses);
-  }
-}
-
-/**
  * Implementation of hook_init() for Yottaa module.
  *
  */
-function yottaa_init()
-{
+function yottaa_init() {
   // Include Yottaa utility functions.
   module_load_include('inc', 'yottaa', 'yottaa.utils');
 }
@@ -37,11 +23,9 @@ function yottaa_init()
  * Implementation of hook_menu() for Yottaa module.
  * Add Yottaa setting link to admin menu.
  */
-function yottaa_menu()
-{
+function yottaa_menu() {
 
   $items = array();
-
 
   $yottaa_user_id = variable_get('yottaa_user_id', '');
   $yottaa_api_key = variable_get('yottaa_api_key', '');
@@ -81,7 +65,8 @@ function yottaa_menu()
       'weight' => 3
     );
 
-  } else {
+  }
+  else {
     $items['admin/config/system/yottaa'] = array(
       'title' => 'Yottaa',
       'description' => 'Manage settings of Yottaa site optimizer.',
@@ -119,8 +104,7 @@ function yottaa_menu()
 /**
  * Implement hook_help()
  */
-function yottaa_help($path, $arg)
-{
+function yottaa_help($path, $arg) {
   switch ($path) {
     case 'admin/help#yottaa':
       $output = '';
@@ -133,8 +117,7 @@ function yottaa_help($path, $arg)
 /**
  * Prepare and generate entry form for new Yottaa account.
  */
-function yottaa_new_account()
-{
+function yottaa_new_account() {
   global $user;
 
   $form['yottaa_new_account'] = array(
@@ -185,8 +168,7 @@ function yottaa_new_account()
 /**
  * Handle Yottaa New Account Submission.
  */
-function yottaa_new_account_submit($form, &$form_state)
-{
+function yottaa_new_account_submit($form, &$form_state) {
   drupal_set_message(t('New account form has been submitted.'));
   $user_name = $form_state['values']['yottaa_user_name'];
   $user_phone = $form_state['values']['yottaa_user_phone'];
@@ -208,12 +190,13 @@ function yottaa_new_account_submit($form, &$form_state)
     variable_set('yottaa_site_id', $site_id);
     variable_set('yottaa_api_key', $api_key);
 
-    unset ($form_state['storage']);
+    unset($form_state['storage']);
     menu_rebuild();
     drupal_goto('admin/config/system/yottaa');
-  } else {
+  }
+  else {
     $error = $json_output["error"];
-    form_set_error('', 'Error received from creating Yottaa user:' . json_encode($error));
+    form_set_error('', filter_xss('Error received from creating Yottaa user:' . json_encode($error)));
   }
 
 }
@@ -221,8 +204,7 @@ function yottaa_new_account_submit($form, &$form_state)
 /**
  * Prepare and generate entry form for Yottaa settings.
  */
-function yottaa_admin_settings()
-{
+function yottaa_admin_settings() {
   $form['yottaa_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('Yottaa Settings'),
@@ -254,7 +236,7 @@ function yottaa_admin_settings()
 
   $form = system_settings_form($form);
 
-  $form['#submit'][] = 'menu_rebuild';
+  $form['#submit'][] = 'yottaa_admin_settings_submit';
 
   return $form;
 }
@@ -262,71 +244,73 @@ function yottaa_admin_settings()
 /**
  * Validate Setting inputs for Yottaa
  */
-function yottaa_admin_settings_validate($form, &$form_state)
-{
+function yottaa_admin_settings_validate($form, &$form_state) {
   $yottaa_user_id = $form_state['values']['yottaa_user_id'];
   $yottaa_api_key = $form_state['values']['yottaa_api_key'];
   $yottaa_site_id = $form_state['values']['yottaa_site_id'];
 
   if ($yottaa_user_id != '' && $yottaa_api_key != '' && $yottaa_site_id != '') {
     $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id, array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
-    $json_output = json_decode(parseHttpResponse($output), true);
-    if ($json_output == null || isset($json_output["error"]) || isset($json_output["error_response"])) {
+    $json_output = json_decode(parseHttpResponse($output), TRUE);
+    if ($json_output == NULL || isset($json_output["error"]) || isset($json_output["error_response"])) {
       form_set_error('', t('Could not authenticate with Yottaa.'));
     }
   }
 }
 
 /**
+ * Implementation of hook_admin_settings_submit
+ */
+function yottaa_admin_settings_submit($form, &$form_state) {
+    menu_rebuild();
+}
+
+/**
  * Return permissions for the Yottaa module.
  */
-function yottaa_permission()
-{
+function yottaa_permission() {
   $perms = array('administer yottaa', 'access yottaa');
   return $perms;
 }
 
 /**
  * Register custom themes for yottaa module.
- *
  */
-function yottaa_theme($existing, $type, $theme, $path)
-{
+function yottaa_theme($existing, $type, $theme, $path) {
   return array(
     'yottaa_info' => array(
-      'arguments' => array('context' => NULL),
+      'variables' => array('context' => NULL),
       'file' => 'yottaa.theme.inc'
     ),
     'yottaa_optimizer_activate_form' => array(
-      'arguments' => array('form' => NULL),
+      'variables' => array('form' => NULL),
       'file' => 'yottaa.theme.inc',
       'render element' => 'form',
     ),
     'yottaa_optimizer_pause_form' => array(
-      'arguments' => array('form' => NULL),
+      'variables' => array('form' => NULL),
       'file' => 'yottaa.theme.inc',
       'render element' => 'form',
     ),
     'yottaa_optimizer_resume_form' => array(
-      'arguments' => array('form' => NULL),
+      'variables' => array('form' => NULL),
       'file' => 'yottaa.theme.inc',
       'render element' => 'form',
     ),
     'yottaa_clear_cache_form' => array(
-      'arguments' => array('form' => NULL),
+      'variables' => array('form' => NULL),
       'file' => 'yottaa.theme.inc',
       'render element' => 'form',
     ),
     'yottaa_auto_clear_cache_form' => array(
-      'arguments' => array('form' => NULL),
+      'variables' => array('form' => NULL),
       'file' => 'yottaa.theme.inc',
       'render element' => 'form',
     )
   );
 }
 
-function yottaa_info()
-{
+function yottaa_info() {
   return theme('yottaa_info', array(
                    'children' => ''
                 ));
@@ -336,8 +320,7 @@ function yottaa_info()
  * Implementation of hook_form().
  *
  */
-function yottaa_optimizer_activate_form($form, &$form_state)
-{
+function yottaa_optimizer_activate_form($form, &$form_state) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#name' => 'activate',
@@ -351,8 +334,7 @@ function yottaa_optimizer_activate_form($form, &$form_state)
  * Implementation of hook_form_submit
  *
  */
-function yottaa_optimizer_activate_form_submit($form, &$form_state)
-{
+function yottaa_optimizer_activate_form_submit($form, &$form_state) {
   unset($form_state['storage']);
   $form_state['redirect'] = 'admin/config/system/yottaa';
 }
@@ -361,8 +343,7 @@ function yottaa_optimizer_activate_form_submit($form, &$form_state)
  * Implementation of hook_form().
  *
  */
-function yottaa_optimizer_pause_form($form, &$form_state)
-{
+function yottaa_optimizer_pause_form($form, &$form_state) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#name' => 'activate',
@@ -376,17 +357,17 @@ function yottaa_optimizer_pause_form($form, &$form_state)
  * Implementation of hook_form_submit
  *
  */
-function yottaa_optimizer_pause_form_submit($form, &$form_state)
-{
+function yottaa_optimizer_pause_form_submit($form, &$form_state) {
   unset($form_state['storage']);
   $json_output = yottaa_pause_yottaa_optimizer();
 
   if (!isset($json_output["error"])) {
     drupal_set_message(t('Your Yottaa optimizer has been paused.'));
     $form_state['redirect'] = 'admin/config/system/yottaa';
-  } else {
+  }
+  else {
     $error = $json_output["error"];
-    form_set_error('', 'Error received from pausing Yottaa optimizer:' . json_encode($error));
+    form_set_error('', filter_xss('Error received from pausing Yottaa optimizer:' . json_encode($error)));
   }
 
 }
@@ -395,8 +376,7 @@ function yottaa_optimizer_pause_form_submit($form, &$form_state)
  * Implementation of hook_form().
  *
  */
-function yottaa_optimizer_resume_form($form, &$form_state)
-{
+function yottaa_optimizer_resume_form($form, &$form_state) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#name' => 'activate',
@@ -410,8 +390,7 @@ function yottaa_optimizer_resume_form($form, &$form_state)
  * Implementation of hook_form_submit
  *
  */
-function yottaa_optimizer_resume_form_submit($form, &$form_state)
-{
+function yottaa_optimizer_resume_form_submit($form, &$form_state) {
   unset($form_state['storage']);
 
   $json_output = yottaa_resume_yottaa_optimizer();
@@ -419,9 +398,10 @@ function yottaa_optimizer_resume_form_submit($form, &$form_state)
   if (!isset($json_output["error"])) {
     drupal_set_message(t('Your Yottaa optimizer has been resumed.'));
     $form_state['redirect'] = 'admin/config/system/yottaa';
-  } else {
+  }
+  else {
     $error = $json_output["error"];
-    form_set_error('', 'Error received from resuming Yottaa optimizer:' . json_encode($error));
+    form_set_error('', filter_xss('Error received from resuming Yottaa optimizer:' . json_encode($error)));
   }
 }
 
@@ -429,8 +409,7 @@ function yottaa_optimizer_resume_form_submit($form, &$form_state)
  * Implementation of hook_form().
  *
  */
-function yottaa_clear_cache_form($form, &$form_state)
-{
+function yottaa_clear_cache_form($form, &$form_state) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#name' => 'clear',
@@ -444,17 +423,17 @@ function yottaa_clear_cache_form($form, &$form_state)
  * Implementation of hook_form_submit
  *
  */
-function yottaa_clear_cache_form_submit($form, &$form_state)
-{
+function yottaa_clear_cache_form_submit($form, &$form_state) {
   unset($form_state['storage']);
   $json_output = yottaa_flush_yottaa_cache();
 
   if (!isset($json_output["error"])) {
     drupal_set_message(t('Cache for all of your sites resources has been removed from Yottaa CDN.'));
     $form_state['redirect'] = 'admin/config/system/yottaa';
-  } else {
+  }
+  else {
     $error = $json_output["error"];
-    form_set_error('', 'Error received from flushing Yottaa cache:' . json_encode($error));
+    form_set_error('', filter_xss('Error received from flushing Yottaa cache:' . json_encode($error)));
   }
 
 }
@@ -463,8 +442,7 @@ function yottaa_clear_cache_form_submit($form, &$form_state)
  * Implementation of hook_form().
  *
  */
-function yottaa_auto_clear_cache_form($form, &$form_state)
-{
+function yottaa_auto_clear_cache_form($form, &$form_state) {
   $form['yottaa_auto_clear_cache'] = array(
     '#type' => 'checkbox',
     '#title' => t('Automatically clear Yottaa\'s site optimizer cache on node changes.'),
@@ -490,15 +468,14 @@ function yottaa_auto_clear_cache_form($form, &$form_state)
  * Implementation of hook_form_submit
  *
  */
-function yottaa_auto_clear_cache_form_submit($form, &$form_state)
-{
+function yottaa_auto_clear_cache_form_submit($form, &$form_state) {
   unset($form_state['storage']);
   variable_set('yottaa_auto_clear_cache', intval($form_state['values']['yottaa_auto_clear_cache']));
   variable_set('reverse_proxy', intval($form_state['values']['yottaa_enable_proxy_mode']));
   $status = intval($form_state['values']['yottaa_auto_clear_cache']) == 1 ? 'enabled' : 'disabled';
-  drupal_set_message(t('Automatically clearing Yottaa\'s site optimizer cache is ' . $status . '.'));
+  drupal_set_message(filter_xss(t('Automatically clearing Yottaa\'s site optimizer cache is ' . $status . '.')));
   $status = intval($form_state['values']['yottaa_enable_proxy_mode']) == 1 ? 'enabled' : 'disabled';
-  drupal_set_message(t('Proxy mode is ' . $status . '.'));
+  drupal_set_message(filter_xss(t('Proxy mode is ' . $status . '.')));
 }
 
 /**
@@ -507,8 +484,7 @@ function yottaa_auto_clear_cache_form_submit($form, &$form_state)
  * @param $node
  * @return void
  */
-function yottaa_node_update($node)
-{
+function yottaa_node_update($node) {
   watchdog('yottaa', 'Caught node update event for node @node.', array('@node' => $node->nid), WATCHDOG_DEBUG);
   yottaa_auto_flush_yottaa_cache($node);
 }
@@ -517,8 +493,7 @@ function yottaa_node_update($node)
  * @param $comment
  * @return void
  */
-function yottaa_comment_update($comment)
-{
+function yottaa_comment_update($comment) {
   watchdog('yottaa', 'Caught comment update event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
   $node = node_load($comment->nid);
   yottaa_auto_flush_yottaa_cache($node);
@@ -528,8 +503,7 @@ function yottaa_comment_update($comment)
  * @param $comment
  * @return void
  */
-function yottaa_comment_insert($comment)
-{
+function yottaa_comment_insert($comment) {
   watchdog('yottaa', 'Caught comment insert event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
   $node = node_load($comment->nid);
   yottaa_auto_flush_yottaa_cache($node);
@@ -539,8 +513,7 @@ function yottaa_comment_insert($comment)
  * @param $comment
  * @return void
  */
-function yottaa_comment_delete($comment)
-{
+function yottaa_comment_delete($comment) {
   watchdog('yottaa', 'Caught comment delete event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
   $node = node_load($comment->nid);
   yottaa_auto_flush_yottaa_cache($node);

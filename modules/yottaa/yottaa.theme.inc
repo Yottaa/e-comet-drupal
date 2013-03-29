@@ -1,7 +1,14 @@
 <?php
+/**
+ * @file
+ *
+ */
 
-function theme_yottaa_info($variables)
-{
+/**
+ * @param $variables
+ * @return array
+ */
+function theme_yottaa_info($variables) {
   drupal_add_css(drupal_get_path('module', 'yottaa') . '/css/yottaa.css');
   $output =  array(
     'header' => array(
@@ -28,18 +35,21 @@ function theme_yottaa_info($variables)
           . ' version of your website using the preview URL (<a href="' . $yottaa_preview_url . '" target="_blank">' . $yottaa_preview_url . '</a>).'
           . ' Before making your site live look over the links and configuration below.</div>'
       );
-    } else if ($yottaa_status == 'live') {
+    }
+    elseif ($yottaa_status == 'live') {
       $output['status'] = array(
         '#type' => 'markup',
         '#markup' => '<div>Your site is currently in <span class="status-live">Live</span>.</div>'
       );
-    } else if ($yottaa_status == 'paused') {
+    }
+    elseif ($yottaa_status == 'paused') {
       $output['status'] = array(
         '#type' => 'markup',
         '#markup' => '<div>Your site is currently in <span class="status-paused">Paused</span>.</div>'
       );
     }
-  } else {
+  }
+  else {
     $error = $json_output["error"];
     $output['status'] = array(
       '#type' => 'markup',
@@ -79,12 +89,14 @@ function theme_yottaa_info($variables)
         '#type' => 'markup',
         '#markup' => drupal_render((drupal_get_form('yottaa_optimizer_activate_form')))
       );
-    } else if ($yottaa_status == 'live') {
+    }
+    elseif ($yottaa_status == 'live') {
       $output['action_a'] = array(
         '#type' => 'markup',
         '#markup' => drupal_render((drupal_get_form('yottaa_optimizer_pause_form')))
       );
-    } else if ($yottaa_status == 'paused') {
+    }
+    elseif ($yottaa_status == 'paused') {
       $output['action_a'] = array(
         '#type' => 'markup',
         '#markup' => drupal_render((drupal_get_form('yottaa_optimizer_resume_form')))
@@ -145,7 +157,8 @@ function theme_yottaa_info($variables)
     $checklist_items_1 = '<div class="checklist-item"><span class="checklist-item-title">Enable caching of site pages</span>';
     if ($settings["site_pages_caching"] == 'included') {
       $checklist_items_1 .= '<span class="checklist-item-status checklist-item-status-passed">Passed</span></div>';
-    } else {
+    }
+    else {
       $checklist_items_1 .= '<span class="checklist-item-status checklist-item-status-failed">Failed</span></div>';
       $checklist_items_1 .= '<div class="checklist-item"><span class="checklist-item-helper">Turn on <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a>.</div>';
     }
@@ -159,7 +172,8 @@ function theme_yottaa_info($variables)
     $checklist_items_2 = '<div class="checklist-item"><span class="checklist-item-title">Only cache pages for anonymous users</span>';
     if ($settings["only_cache_anonymous_users"] == 'included') {
       $checklist_items_2 .= '<span class="checklist-item-status checklist-item-status-passed">Passed</span></div>';
-    } else {
+    }
+    else {
       $checklist_items_2 .= '<span class="checklist-item-status checklist-item-status-failed">Failed</span></div>';
       $checklist_items_2 .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> which includes resource from optimization if URI contains "/" and Request-Header whose name equals to "Cookie" and whose value doesen\'t contain "SESS" </div>';
     }
@@ -173,7 +187,8 @@ function theme_yottaa_info($variables)
     $checklist_items_3 = '<div class="checklist-item"><span class="checklist-item-title">Disable caching of node editing pages</span>';
     if ($settings["edit_pages_caching"] == 'excluded') {
       $checklist_items_3 .= '<span class="checklist-item-status checklist-item-status-passed">Passed</span></div>';
-    } else {
+    }
+    else {
       $checklist_items_3 .= '<span class="checklist-item-status checklist-item-status-failed">Failed</span></div>';
       $checklist_items_3 .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exclude exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> with a "contains" expression of <strong>/edit</strong>.</div>';
     }
@@ -187,7 +202,8 @@ function theme_yottaa_info($variables)
     $checklist_items_4 = '<div class="checklist-item"><span class="checklist-item-title">Disable caching of configuration pages</span>';
     if ($settings["configure_pages_caching"] == 'excluded') {
       $checklist_items_4 .= '<span class="checklist-item-status checklist-item-status-passed">Passed</span></div>';
-    } else {
+    }
+    else {
       $checklist_items_4 .= '<span class="checklist-item-status checklist-item-status-failed">Failed</span></div>';
       $checklist_items_4 .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exclude exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> with a "contains" expression of <strong>admin/</strong>.</div>';
       $checklist_items_4 .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exclude exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> with a "contains" expression of <strong>admin%252F</strong>.</div>';
@@ -203,7 +219,8 @@ function theme_yottaa_info($variables)
     if (variable_get('reverse_proxy', 0) == 0 && $yottaa_status == 'live') {
       $checklist_items_5 .= '<span class="checklist-item-status checklist-item-status-failed">Failed</span></div>';
       $checklist_items_5 .= '<div class="checklist-item"><span class="checklist-item-helper">Need to enable the proxy mode for drupal using the form in Settings section.<div>';
-    } else {
+    }
+    else {
       $checklist_items_5 .= '<span class="checklist-item-status checklist-item-status-passed">Passed</span></div>';
     }
 
@@ -221,8 +238,7 @@ function theme_yottaa_info($variables)
  *
  * @param $form
  */
-function theme_yottaa_optimizer_activate_form($variables)
-{
+function theme_yottaa_optimizer_activate_form($variables) {
   $yottaa_site_id = variable_get('yottaa_site_id', '');
   $active_link = '<a class="button" href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '" target="_blank"> Activate Optimizations</a>';
   $rows = array(array(t($active_link), t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
@@ -234,8 +250,7 @@ function theme_yottaa_optimizer_activate_form($variables)
  *
  * @param $form
  */
-function theme_yottaa_optimizer_pause_form($variables)
-{
+function theme_yottaa_optimizer_pause_form($variables) {
   $form = $variables['form'];
   $rows = array(array(drupal_render($form['submit']), t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
   return theme('table', array('rows' => $rows)) . drupal_render_children($form);
@@ -246,8 +261,7 @@ function theme_yottaa_optimizer_pause_form($variables)
  *
  * @param $form
  */
-function theme_yottaa_optimizer_resume_form($variables)
-{
+function theme_yottaa_optimizer_resume_form($variables) {
   $form = $variables['form'];
   $rows = array(array(drupal_render($form['submit']), t('Starting optimization will apply optimizations on your website within 5minutes.')));
   return theme('table', array('rows' => $rows)) . drupal_render_children($form);
@@ -258,8 +272,7 @@ function theme_yottaa_optimizer_resume_form($variables)
  *
  * @param $form
  */
-function theme_yottaa_clear_cache_form($variables)
-{
+function theme_yottaa_clear_cache_form($variables) {
   $form = $variables['form'];
   $rows = array(array(drupal_render($form['submit']), t('Clearing the cache will remove all of your sites resources from our CDN. Use this option if you have updated a resource (gif, css, JavaScript).')));
   return theme('table', array('rows' => $rows)) . drupal_render_children($form);
@@ -270,8 +283,7 @@ function theme_yottaa_clear_cache_form($variables)
  *
  * @param $form
  */
-function theme_yottaa_auto_clear_cache_form($variables)
-{
+function theme_yottaa_auto_clear_cache_form($variables) {
   $form = $variables['form'];
   $rows = array(array(drupal_render($form['submit'])));
   return drupal_render_children($form) . theme('table', array('rows' => $rows));
