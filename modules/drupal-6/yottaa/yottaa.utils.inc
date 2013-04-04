@@ -324,7 +324,7 @@ function post_processing_settings($json_output) {
 function yottaa_auto_flush_yottaa_cache($node) {
   $yottaa_auto_clear_cache = variable_get('yottaa_auto_clear_cache', 1);
   if ($yottaa_auto_clear_cache == 1) {
-    $json_output = yottaa_flush_yottaa_cache();
+    $json_output = flush_yottaa_cache();
     // drupal_set_message(t('Cache flushed!'));
     if (isset($json_output["error"])) {
       $error = $json_output["error"];
@@ -332,38 +332,5 @@ function yottaa_auto_flush_yottaa_cache($node) {
       watchdog('yottaa', 'Error received when flushing Yottaa cache for node @node. @error', array('@node' => $node->nid, '@error' => json_encode($error)), WATCHDOG_ERROR);
     }
     watchdog('yottaa', 'Flushed Yottaa cache for node @node.', array('@node' => $node->nid), WATCHDOG_DEBUG);
-  }
-}
-
-/**
- * Flushes all cached Yottaa pages.
- *
- * @return void
- */
-function yottaa_flush_yottaa_cache_all() {
-  $json_output = yottaa_flush_yottaa_cache();
-  if (isset($json_output["error"])) {
-    $error = $json_output["error"];
-    watchdog('yottaa', 'Error received when flushing all Yottaa cache. @error', array('@error' => json_encode($error)), WATCHDOG_ERROR);
-  }
-  else {
-    watchdog('yottaa', 'Flushed all Yottaa cache.', array(), WATCHDOG_DEBUG);
-  }
-}
-
-/**
- * Flushed cached Yottaa pages with the given paths.
- *
- * @param $paths
- * @return void
- */
-function yottaa_flush_yottaa_cache_pages($paths) {
-  $json_output = yottaa_flush_yottaa_cache();
-  if (isset($json_output["error"])) {
-    $error = $json_output["error"];
-    watchdog('yottaa', 'Error received when flushing Yottaa cache for paths @path_list. @error', array('@path_list' => implode(';', $paths),'@error' => json_encode($error)), WATCHDOG_ERROR);
-  }
-  else {
-    watchdog('yottaa', 'Flushed Yottaa cache for paths @path_list.', array('@path_list' => implode(';', $paths)), WATCHDOG_DEBUG);
   }
 }
