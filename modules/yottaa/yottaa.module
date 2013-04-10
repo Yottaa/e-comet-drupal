@@ -257,8 +257,8 @@ function yottaa_admin_settings_validate($form, &$form_state) {
   $yottaa_site_id = $form_state['values']['yottaa_site_id'];
 
   if ($yottaa_user_id != '' && $yottaa_api_key != '' && $yottaa_site_id != '') {
-    $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id, array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
-    $json_output = json_decode(parse_http_response($output), TRUE);
+    $output = yottaa_curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id, array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
+    $json_output = json_decode(yottaa_parse_http_response($output), TRUE);
     if ($json_output == NULL || isset($json_output["error"]) || isset($json_output["error_response"])) {
       form_set_error('', t('Could not authenticate with Yottaa.'));
     }
