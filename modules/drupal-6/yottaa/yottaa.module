@@ -13,6 +13,7 @@
  * Implementation of hook_boot() for Yottaa module.
  *
  */
+/*
 function yottaa_boot() {
   if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
     $reverse_proxy_addresses = variable_get('reverse_proxy_addresses', array());
@@ -21,7 +22,7 @@ function yottaa_boot() {
     variable_set('reverse_proxy_addresses', $reverse_proxy_addresses);
   }
 }
-
+*/
 /**
  * Implementation of hook_init() for Yottaa module.
  *
@@ -508,9 +509,11 @@ function yottaa_auto_clear_cache_form_submit($form, &$form_state) {
  * @return void
  */
 function yottaa_nodeapi(&$node, $op) {
-  if ($op == 'update') {
-    watchdog('yottaa', 'Caught node update event for node @node.', array('@node' => $node->nid), WATCHDOG_DEBUG);
-    yottaa_auto_flush_yottaa_cache($node);
+  if (!module_exists('expire')) {
+    if ($op == 'update') {
+      watchdog('yottaa', 'Caught node update event for node @node.', array('@node' => $node->nid), WATCHDOG_DEBUG);
+      yottaa_auto_flush_yottaa_cache($node);
+    }
   }
 }
 
@@ -523,10 +526,24 @@ function yottaa_nodeapi(&$node, $op) {
  * @return void
  */
 function yottaa_comment(&$comment, $op) {
-  if ($op == 'update' || $op == 'insert' || $op == 'delete') {
-    watchdog('yottaa', 'Caught comment update event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
-    $node = node_load($comment->nid);
-    yottaa_auto_flush_yottaa_cache($node);
+  if (!module_exists('expire')) {
+    if ($op == 'update' || $op == 'insert' || $op == 'delete') {
+      watchdog('yottaa', 'Caught comment update event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
+      $node = node_load($comment->nid);
+      yottaa_auto_flush_yottaa_cache($node);
+    }
+  }
+}
+
+/**
+ * Implements hook_expire_cache().
+ *
+ * Takes an array from expire.module and issue purges.
+ */
+function yottaa_expire_cache($paths) {
+  $yottaa_auto_clear_cache = variable_get('yottaa_auto_clear_cache', 1);
+  if ($yottaa_auto_clear_cache == 1) {
+    yottaa_flush_yottaa_cache_pages($paths);
   }
 }
 
