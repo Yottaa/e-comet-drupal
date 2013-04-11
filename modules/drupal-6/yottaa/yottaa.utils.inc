@@ -11,7 +11,7 @@
  * @param NULL $content
  * @return bool|string
  */
-function parse_http_response($content = NULL) {
+function yottaa_parse_http_response($content = NULL) {
   if (empty($content)) {
     return FALSE;
   }
@@ -25,12 +25,12 @@ function parse_http_response($content = NULL) {
   $headers = explode("\n", $header);
   unset($hunks);
   unset($header);
-  if (!validate_http_response($headers)) {
+  if (!yottaa_validate_http_response($headers)) {
     return '{"error" : ' . trim($body) . '}';
     //return FALSE;
   }
   if (in_array('Transfer-Coding: chunked', $headers)) {
-    return trim(unchunk_http_response($body));
+    return trim(yottaa_unchunk_http_response($body));
   }
   else {
     return trim($body);
@@ -44,7 +44,7 @@ function parse_http_response($content = NULL) {
  * @param NULL $headers
  * @return bool
  */
-function validate_http_response($headers = NULL) {
+function yottaa_validate_http_response($headers = NULL) {
   if (!is_array($headers) or count($headers) < 1) {
     return FALSE;
   }
@@ -67,7 +67,7 @@ function validate_http_response($headers = NULL) {
  * @param NULL $str
  * @return bool|NULL|string
  */
-function unchunk_http_response($str = NULL) {
+function yottaa_unchunk_http_response($str = NULL) {
   if (!is_string($str) or strlen($str) < 1) {
     return FALSE;
   }
@@ -99,7 +99,7 @@ function unchunk_http_response($str = NULL) {
  * @param $method
  * @return string
  */
-function curl_post_async($url, $params, $method, $api_key) {
+function yottaa_curl_post_async($url, $params, $method, $api_key) {
   foreach ($params as $key => &$val) {
     if (is_array($val)) $val = implode(',', $val);
     $post_params[] = $key . '=' . urlencode($val);
@@ -144,8 +144,8 @@ function yottaa_create_yottaa_account($full_name, $email, $phone, $site) {
   $user_id = '4d34f75b74b1553ba500007f';
   $api_key = '455df7500258012f663b12313d145ceb';
   list($first_name, $last_name) = explode(" ", $full_name);
-  $output = curl_post_async("https://api.yottaa.com/partners/" . $user_id . "/accounts", array("first_name" => $first_name, "last_name" => $last_name, "email" => $email, "phone" => $phone, "site" => $site), "POST", $api_key);
-  return json_decode(parse_http_response($output), TRUE);
+  $output = yottaa_curl_post_async("https://api.yottaa.com/partners/" . $user_id . "/accounts", array("first_name" => $first_name, "last_name" => $last_name, "email" => $email, "phone" => $phone, "site" => $site), "POST", $api_key);
+  return json_decode(yottaa_parse_http_response($output), TRUE);
 }
 
 /**
@@ -157,8 +157,8 @@ function yottaa_check_yottaa_status() {
   $yottaa_user_id = variable_get('yottaa_user_id', '');
   $yottaa_api_key = variable_get('yottaa_api_key', '');
   $yottaa_site_id = variable_get('yottaa_site_id', '');
-  $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id, array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
-  return json_decode(parse_http_response($output), TRUE);
+  $output = yottaa_curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id, array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
+  return json_decode(yottaa_parse_http_response($output), TRUE);
 }
 
 /**
@@ -170,8 +170,8 @@ function yottaa_resume_yottaa_optimizer() {
   $yottaa_user_id = variable_get('yottaa_user_id', '');
   $yottaa_api_key = variable_get('yottaa_api_key', '');
   $yottaa_site_id = variable_get('yottaa_site_id', '');
-  $output = curl_post_async("https://api.yottaa.com/optimizers/" . $yottaa_site_id . "/resume", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
-  return json_decode(parse_http_response($output), TRUE);
+  $output = yottaa_curl_post_async("https://api.yottaa.com/optimizers/" . $yottaa_site_id . "/resume", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
+  return json_decode(yottaa_parse_http_response($output), TRUE);
 }
 
 /**
@@ -183,8 +183,8 @@ function yottaa_pause_yottaa_optimizer() {
   $yottaa_user_id = variable_get('yottaa_user_id', '');
   $yottaa_api_key = variable_get('yottaa_api_key', '');
   $yottaa_site_id = variable_get('yottaa_site_id', '');
-  $output = curl_post_async("https://api.yottaa.com/optimizers/" . $yottaa_site_id . "/pause", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
-  return json_decode(parse_http_response($output), TRUE);
+  $output = yottaa_curl_post_async("https://api.yottaa.com/optimizers/" . $yottaa_site_id . "/pause", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
+  return json_decode(yottaa_parse_http_response($output), TRUE);
 }
 
 /**
@@ -196,8 +196,8 @@ function yottaa_retrieve_yottaa_settings() {
   $yottaa_user_id = variable_get('yottaa_user_id', '');
   $yottaa_api_key = variable_get('yottaa_api_key', '');
   $yottaa_site_id = variable_get('yottaa_site_id', '');
-  $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id . "/settings", array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
-  return post_processing_settings(json_decode(parse_http_response($output), TRUE));
+  $output = yottaa_curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id . "/settings", array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
+  return yottaa_post_processing_settings(json_decode(yottaa_parse_http_response($output), TRUE));
 }
 
 /**
@@ -209,8 +209,8 @@ function yottaa_flush_yottaa_cache() {
   $yottaa_user_id = variable_get('yottaa_user_id', '');
   $yottaa_api_key = variable_get('yottaa_api_key', '');
   $yottaa_site_id = variable_get('yottaa_site_id', '');
-  $output = curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id . "/flush_cache", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
-  return json_decode(parse_http_response($output), TRUE);
+  $output = yottaa_curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id . "/flush_cache", array("user_id" => $yottaa_user_id), "PUT", $yottaa_api_key);
+  return json_decode(yottaa_parse_http_response($output), TRUE);
 }
 
 
@@ -220,7 +220,7 @@ function yottaa_flush_yottaa_cache() {
  * @param $json_output
  * @return array
  */
-function post_processing_settings($json_output) {
+function yottaa_post_processing_settings($json_output) {
   if (!isset($json_output["error"])) {
 
     $site_pages_key = "/";

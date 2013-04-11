@@ -1,14 +1,14 @@
 <project name="yottaa.drupal" default="dev">
 
-    <property file="custom-build.properties"/>
-
-    <property file="build.properties"/>
-
     <property name="yottaa.module.id" value="yottaa"/>
     <property name="yottaa.module.title" value="Yottaa Drupal Integration"/>
 
     <property name="drupal.module.id" value="yottaa-7.x-1.0"/>
     <property name="drupal.module.title" value="Drupal Module for Yottaa Integration"/>
+
+    <property file="custom-build.properties"/>
+
+    <property file="build.properties"/>
 
     <property name="project.dir" value="."/>
 
@@ -18,6 +18,7 @@
     <property name="drupal.module.yottaa.dir" value="${drupal.dir}/yottaa"/>
 
     <property name="build.dir" value="${project.dir}/build"/>
+    <property name="dist.dir"  value="${project.dir}/dist"/>
 
     <property name="drupal.module.package.file.tar.gz" value="${build.dir}/${drupal.module.id}.tar.gz"/>
 
@@ -44,8 +45,16 @@
 
     <target name="package" depends="package-drupal-module"/>
 
+    <target name="dist" depends="package">
+        <copy todir="${dist.dir}" verbose="true">
+            <fileset dir="${build.dir}">
+                <include name="*.tar.gz"/>
+            </fileset>
+        </copy>
+    </target>
+
     <target name="dev">
-        <copy todir="${drupal.location}/sites/all/modules//${yottaa.module.id}" verbose="true">
+        <copy todir="${drupal.location}/sites/all/modules/${yottaa.module.id}" verbose="true">
             <fileset dir="${drupal.dir}/${yottaa.module.id}"/>
         </copy>
     </target>
@@ -72,18 +81,18 @@
     </target>
 
     <!--  drupal.pageloadtest.org  -->
-    <target name="unpublish1">
-        <sshexec host="23.20.15.127"
-                 username="yadmin"
-                 password="yottaarific123"
+    <target name="unpublish-drupal6">
+        <sshexec host="${scp.drupal6.host}"
+                 username="${scp.drupal6.username}"
+                 password="${scp.drupal6.password}"
                  trust="true"
-                 command="rm -r /home/yadmin/${yottaa.module.id}/*"
+                 command="rm -r ${scp.drupal6.basepath}/*"
                  failonerror="false"/>
     </target>
 
-    <target name="publish1" depends="unpublish1">
-        <scp todir="yadmin@23.20.15.127:/home/yadmin/${yottaa.module.id}"
-             password="yottaarific123"
+    <target name="publish-drupal6" depends="unpublish-drupal6">
+        <scp todir="${scp.drupal6.username}@${scp.drupal6.host}:${scp.drupal6.basepath}"
+             password="${scp.drupal6.password}"
              trust="true"
              verbose="true"
              failonerror="true">
