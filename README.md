@@ -25,35 +25,31 @@ Whether you're already a Yottaa Site Optimizer user or want to try it for the fi
 
 3. Setup Dev Environment for Yottaa Module
 
-If you have local or remote installation of Drupal and you want update the module constantly, you can add a custom-build.properties file right under the root directory of your copy of github project.
+    If you have local or remote installation of Drupal and you want update the module constantly, you can add a custom-build.properties file right under the root directory of your copy of github project.
 
-Put following configurations in the properties file and replace the values with your own settings
+    Put following configurations in the properties file and replace the values with your own settings
 
-```
-drupal.location=[Root directory of your local Drupal installation]
+    ```
+    drupal.location=[Root directory of your local Drupal installation]
+    scp.drupal.host=[Server IP for your remote Drupal installation]
+    scp.drupal.username=[Username for accessing your server]
+    scp.drupal.password=[Password for accessing your server]
+    scp.drupal.basepath=[Root directory of your remote Drupal installation]
+    ```
 
-scp.drupal.host=[Server IP for your remote Drupal installation]
+    You can then run
 
-scp.drupal.username=[Username for accessing your server]
+    ```
+    ant dev
+    ```
+    to update your local Drupal installation.
 
-scp.drupal.password=[Password for accessing your server]
+    or
 
-scp.drupal.basepath=[Root directory of your remote Drupal installation]
-```
-
-You can then run
-
-```
-ant dev
-```
-to update your local Drupal installation.
-
-or
-
-```
-ant publish
-```
-to update your remote Drupal installation.
+    ```
+    ant publish
+    ```
+    to update your remote Drupal installation.
 
 ## Links ##
 
