@@ -11,17 +11,17 @@ Whether you're already a Yottaa Site Optimizer user or want to try it for the fi
 
 1. Install Ant
 
-Install and add [required jars](http://ant.apache.org/manual/Tasks/scp.html) for scp task.
+    Install and add [required jars](http://ant.apache.org/manual/Tasks/scp.html) for scp task.
 
 2. Build Yottaa Module
 
-Once you clone the repository, run following ant command to build the Yottaa module
+    Once you clone the repository, run following ant command to build the Yottaa module
 
-```
-ant package
-```
+    ```
+    ant package
+    ```
 
-You can then install the module with the generated zip file.
+    You can then install the module with the generated zip file.
 
 3. Setup Dev Environment for Yottaa Module
 
