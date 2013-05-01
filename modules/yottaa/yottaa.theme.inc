@@ -9,6 +9,7 @@
  * @return array
  */
 function theme_yottaa_info($variables) {
+  $yottaa_api = yottaa_api_drupal();
   drupal_add_css(drupal_get_path('module', 'yottaa') . '/css/yottaa.css');
   $output =  array(
     'header' => array(
@@ -19,11 +20,12 @@ function theme_yottaa_info($variables) {
     )
   );
 
-  $yottaa_site_id = variable_get('yottaa_site_id', '');
-  $yottaa_user_id = variable_get('yottaa_user_id', '');
-  $yottaa_api_key = variable_get('yottaa_api_key', '');
+  $parameters = $yottaa_api->getParameters();
+  $yottaa_site_id = $parameters['site_id'];
+  $yottaa_user_id = $parameters['user_id'];
+  $yottaa_api_key = $parameters['api_key'];
 
-  $json_output = yottaa_check_yottaa_status();
+  $json_output = $yottaa_api->getStatus();
   $yottaa_status = $json_output["optimizer"];
 
   if (!isset($json_output["error"])) {
@@ -143,7 +145,7 @@ function theme_yottaa_info($variables) {
     '#markup' => '<h3>Checklist</h3>'
   );
 
-  $settings = yottaa_retrieve_yottaa_settings();
+  $settings = $yottaa_api->getSettings();
 
   if (!isset($settings["error"])) {
 

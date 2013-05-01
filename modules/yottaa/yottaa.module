@@ -16,7 +16,8 @@
  */
 function yottaa_init() {
   // Include Yottaa utility functions.
-  module_load_include('inc', 'yottaa', 'yottaa.utils');
+  module_load_include('inc', 'yottaa', 'yottaa.api');
+  module_load_include('inc', 'yottaa', 'yottaa.api.drupal');
 }
 
 /**
@@ -26,6 +27,8 @@ function yottaa_init() {
 function yottaa_menu() {
 
   $items = array();
+
+  //$yottaa_api = yottaa_api_drupal();
 
   $yottaa_user_id = variable_get('yottaa_user_id', '');
   $yottaa_api_key = variable_get('yottaa_api_key', '');
@@ -169,26 +172,22 @@ function yottaa_new_account() {
  * Handle Yottaa New Account Submission.
  */
 function yottaa_new_account_submit($form, &$form_state) {
+  $yottaa_api = yottaa_api_drupal();
   drupal_set_message(t('New account form has been submitted.'));
   $user_name = $form_state['values']['yottaa_user_name'];
   $user_phone = $form_state['values']['yottaa_user_phone'];
   $user_email = $form_state['values']['yottaa_user_email'];
   $site_name = $form_state['values']['yottaa_site_name'];
 
-  $json_output = yottaa_create_yottaa_account($user_name, $user_email, $user_phone, $site_name);
+  $json_output = $yottaa_api->createAccount($user_name, $user_email, $user_phone, $site_name);
 
   if (!isset($json_output["error"])) {
-    $user_id = $json_output["user_id"];
-    $site_id = $json_output["site_id"];
-    $api_key = $json_output["api_key"];
     $preview_url = $json_output["preview_url"];
 
     drupal_set_message(t('New account form has been created with preview url <a href="@preview_url">@preview_url</a>', array('@preview_url' => $preview_url)));
     drupal_set_message(t('Your Yottaa login information has been sent to your email address @user_email.', array('@user_email' => $user_email)));
 
-    variable_set('yottaa_user_id', $user_id);
-    variable_set('yottaa_site_id', $site_id);
-    variable_set('yottaa_api_key', $api_key);
+    $yottaa_api->updateParameters($json_output["api_key"],$json_output["user_id"],$json_output["site_id"]);
 
     unset($form_state['storage']);
     menu_rebuild();
@@ -257,8 +256,8 @@ function yottaa_admin_settings_validate($form, &$form_state) {
   $yottaa_site_id = $form_state['values']['yottaa_site_id'];
 
   if ($yottaa_user_id != '' && $yottaa_api_key != '' && $yottaa_site_id != '') {
-    $output = yottaa_curl_post_async("https://api.yottaa.com/sites/" . $yottaa_site_id, array("user_id" => $yottaa_user_id), "GET", $yottaa_api_key);
-    $json_output = json_decode(yottaa_parse_http_response($output), TRUE);
+    $yottaa_api = yottaa_api_drupal();
+    $json_output = $yottaa_api->getRuntimeStatus($yottaa_api_key, $yottaa_user_id, $yottaa_site_id);
     if ($json_output == NULL || isset($json_output["error"]) || isset($json_output["error_response"])) {
       form_set_error('', t('Could not authenticate with Yottaa.'));
     }
@@ -367,7 +366,8 @@ function yottaa_optimizer_pause_form($form, &$form_state) {
  */
 function yottaa_optimizer_pause_form_submit($form, &$form_state) {
   unset($form_state['storage']);
-  $json_output = yottaa_pause_yottaa_optimizer();
+  $yottaa_api = yottaa_api_drupal();
+  $json_output = $yottaa_api->pause();
 
   if (!isset($json_output["error"])) {
     drupal_set_message(t('Your Yottaa optimizer has been paused.'));
@@ -401,7 +401,8 @@ function yottaa_optimizer_resume_form($form, &$form_state) {
 function yottaa_optimizer_resume_form_submit($form, &$form_state) {
   unset($form_state['storage']);
 
-  $json_output = yottaa_resume_yottaa_optimizer();
+  $yottaa_api = yottaa_api_drupal();
+  $json_output = $yottaa_api->resume();
 
   if (!isset($json_output["error"])) {
     drupal_set_message(t('Your Yottaa optimizer has been resumed.'));
@@ -433,7 +434,9 @@ function yottaa_clear_cache_form($form, &$form_state) {
  */
 function yottaa_clear_cache_form_submit($form, &$form_state) {
   unset($form_state['storage']);
-  $json_output = yottaa_flush_yottaa_cache();
+
+  $yottaa_api = yottaa_api_drupal();
+  $json_output = $yottaa_api->flush();
 
   if (!isset($json_output["error"])) {
     drupal_set_message(t('Cache for all of your sites resources has been removed from Yottaa CDN.'));
@@ -496,7 +499,8 @@ function yottaa_auto_clear_cache_form_submit($form, &$form_state) {
 function yottaa_node_update($node) {
   if (!module_exists('expire')) {
     watchdog('yottaa', 'Caught node update event for node @node.', array('@node' => $node->nid), WATCHDOG_DEBUG);
-    yottaa_auto_flush_yottaa_cache($node);
+    $yottaa_api = yottaa_api_drupal();
+    $yottaa_api->flushPaths($node);
   }
 }
 
@@ -508,7 +512,8 @@ function yottaa_comment_update($comment) {
   if (!module_exists('expire')) {
     watchdog('yottaa', 'Caught comment update event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
     $node = node_load($comment->nid);
-    yottaa_auto_flush_yottaa_cache($node);
+    $yottaa_api = yottaa_api_drupal();
+    $yottaa_api->flushPaths($node);
   }
 }
 
@@ -520,7 +525,8 @@ function yottaa_comment_insert($comment) {
   if (!module_exists('expire')) {
     watchdog('yottaa', 'Caught comment insert event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
     $node = node_load($comment->nid);
-    yottaa_auto_flush_yottaa_cache($node);
+    $yottaa_api = yottaa_api_drupal();
+    $yottaa_api->flushPaths($node);
   }
 }
 
@@ -532,7 +538,8 @@ function yottaa_comment_delete($comment) {
   if (!module_exists('expire')) {
     watchdog('yottaa', 'Caught comment delete event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
     $node = node_load($comment->nid);
-    yottaa_auto_flush_yottaa_cache($node);
+    $yottaa_api = yottaa_api_drupal();
+    $yottaa_api->flushPaths($node);
   }
 }
 
@@ -542,9 +549,10 @@ function yottaa_comment_delete($comment) {
  * Takes an array from expire.module and issue purges.
  */
 function yottaa_expire_cache($paths) {
-  $yottaa_auto_clear_cache = variable_get('yottaa_auto_clear_cache', 1);
+  $yottaa_api = yottaa_api_drupal();
+  $yottaa_auto_clear_cache = $yottaa_api->getAutoClearCacheParameter();
   if ($yottaa_auto_clear_cache == 1) {
-    yottaa_flush_yottaa_cache_pages($paths);
+    $yottaa_api->flushPaths($paths);
   }
 }
 
