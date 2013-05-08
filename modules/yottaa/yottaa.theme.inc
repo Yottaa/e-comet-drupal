@@ -172,12 +172,12 @@ function theme_yottaa_info($variables) {
 
     // Only cache pages for anonymous users
     $checklist_items_2 = '<div class="checklist-item"><span class="checklist-item-title">Only cache pages for anonymous users</span>';
-    if ($settings["only_cache_anonymous_users"] == 'included') {
+    if ($settings["only_cache_anonymous_users"] == 'excluded') {
       $checklist_items_2 .= '<span class="checklist-item-status checklist-item-status-passed">Passed</span></div>';
     }
     else {
       $checklist_items_2 .= '<span class="checklist-item-status checklist-item-status-failed">Failed</span></div>';
-      $checklist_items_2 .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> which includes resource from optimization if URI contains "/" and Request-Header whose name equals to "Cookie" and whose value doesen\'t contain "SESS" </div>';
+      $checklist_items_2 .= '<div class="checklist-item"><span class="checklist-item-helper">Add an exception into the <a href="https://apps.yottaa.com/framework/web/sites/' . $yottaa_site_id . '/settings?tab=1" target="_blank">HTML Caching</a> which excludes resource from optimization if Request-Header whose name equals to "Cookie" and whose value contains "SESS".</div>';
     }
 
     $output['checklist_items_2'] = array(

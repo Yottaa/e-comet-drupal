@@ -10,6 +10,7 @@ class YottaaDrupalAPI extends YottaaAPI {
   public $user_id_varname = 'yottaa_user_id';
   public $site_id_varname = 'yottaa_site_id';
   public $auto_clear_cache_varname = 'yottaa_auto_clear_cache';
+  public $enable_logging_varname = 'yottaa_enable_logging';
 
   public function __construct() {
     $key = variable_get($this->api_key_varname, '');
@@ -65,6 +66,21 @@ class YottaaDrupalAPI extends YottaaAPI {
   }
 
   /**
+   * @return
+   */
+  public function getEnableLoggingParameter() {
+    return variable_get($this->enable_logging_varname, 1);
+  }
+
+  /**
+   * @param $enabled
+   * @return void
+   */
+  public function setEnableLoggingParameter($enabled) {
+    variable_set($this->enable_logging_varname, $enabled);
+  }
+
+  /**
    * Post-process settings return from Yottaa service.
    *
    * @param $json_output
@@ -73,7 +89,8 @@ class YottaaDrupalAPI extends YottaaAPI {
   protected function postProcessingSettings($json_output) {
     if (!isset($json_output["error"])) {
 
-      $site_pages_key = "/";
+      //$site_pages_key = "/";
+      $full_pages_key = "(.*)";
       $configure_pages_key1 = "admin/";
       $configure_pages_key2 = "admin%252F";
       $edit_pages_key = "/edit";
@@ -103,10 +120,18 @@ class YottaaDrupalAPI extends YottaaAPI {
                 $matches = $filter["match"];
                 foreach ($matches as &$match) {
                   if (isset($match["condition"])) {
+                    /*
                     if ($match["condition"] == $site_pages_key && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
                       $only_cache_anonymous_users = $direction;
                     }
                     if ($match["name"] == "Request-Header" && $match["header_name"] == "Cookie" && $match["condition"] == "SESS" && $match["type"] == "0" && $match["operator"] == "NOT-CONTAIN") {
+                      $excluded_sess_cookie = "set";
+                    }
+                    */
+                    if ($match["condition"] == $full_pages_key && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "REGEX") {
+                      $only_cache_anonymous_users = $direction;
+                    }
+                    if ($match["name"] == "Request-Header" && $match["header_name"] == "Cookie" && $match["condition"] == "SESS" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
                       $excluded_sess_cookie = "set";
                     }
                     if ($match["condition"] == $edit_pages_key && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
@@ -160,6 +185,23 @@ class YottaaDrupalAPI extends YottaaAPI {
     }
     else {
       return $json_output;
+    }
+  }
+
+  /**
+   * Logs a message.
+   *
+   * @param $message
+   * @return void
+   */
+  public function log($message) {
+    if ($this->getEnableLoggingParameter() == 1) {
+      if (is_array($message) || is_object($message)) {
+        watchdog('yottaa', print_r($message, true));
+      }
+      else {
+        watchdog('yottaa', $message);
+      }
     }
   }
 }

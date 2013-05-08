@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Yottaa API Class.
+ * Base Yottaa API Class for PHP based plugins.
  */
 
 class YottaaAPI {
@@ -22,7 +22,7 @@ class YottaaAPI {
   private $uid;
 
   /**
-   * The side id.
+   * The site id.
    */
   private $sid;
 
@@ -36,14 +36,20 @@ class YottaaAPI {
   }
 
   /**
-   * Check if it has all required parameters.
+   * Checks if it has all required parameters.
    */
   public function isEmpty() {
     return empty($this->key) || empty($this->uid) || empty($this->sid);
   }
 
   /**
-   * Create an account.
+   * Creates an account.
+   *
+   * @param $name
+   * @param $email
+   * @param $phone
+   * @param $site
+   * @return mixed
    */
   public function createAccount($name, $email, $phone, $site) {
     $user_id = '4d34f75b74b1553ba500007f';
@@ -66,7 +72,7 @@ class YottaaAPI {
   }
 
   /**
-   * Return site settings.
+   * Returns Yottaa site full settings and performances post-processing.
    */
   public function getSettings() {
     $result = $this->call('sites/' . $this->sid . '/settings', array(
@@ -86,6 +92,11 @@ class YottaaAPI {
 
   /**
    * Returns site status.
+   *
+   * @param $key
+   * @param $uid
+   * @param $sid
+   * @return mixed
    */
   public function getRuntimeStatus($key,$uid,$sid) {
     return $this->call('sites/' . $sid, array(
@@ -103,14 +114,22 @@ class YottaaAPI {
   }
 
   /**
-   * Flushes cache by path.
+   * Flushes cache by path(s).
+   *
+   * @param $path_configs
+   * @return mixed
    */
-  public function flushPaths($paths) {
-    return $this->flush();
+  public function flushPaths($path_configs) {
+    $aggregated_return = array();
+    foreach ($path_configs as $path_config) {
+      $result = $this->call('sites/' . $this->sid . '/purge_cache?user_id=' . $this->uid . '&type=html', $path_config, 'POST', $this->key, TRUE);
+      array_push($aggregated_return, array("config"=> $path_config, "result" => $result));
+    }
+    return $aggregated_return;
   }
 
   /**
-   * Pause optimization.
+   * Pauses optimization.
    */
   public function pause() {
     return $this->call('optimizers/' . $this->sid . '/pause', array(
@@ -119,7 +138,7 @@ class YottaaAPI {
   }
 
   /**
-   * Resume optimization.
+   * Resumes optimization.
    */
   public function resume() {
     return $this->call('optimizers/' . $this->sid . '/resume', array(
@@ -128,22 +147,36 @@ class YottaaAPI {
   }
 
   /**
-   * Make an api call.
+   * Makes an api call.
+   *
+   * @param $path
+   * @param $params
+   * @param $method
+   * @param $key
+   * @return mixed
    */
-  private function call($path, $params, $method, $key) {
-    $output = $this->post_async($this->api . $path, $params, $method, $key);
+  private function call($path, $params, $method, $key , $post_json=FALSE) {
+    $output = $this->post_async($this->api . $path, $params, $method, $key, $post_json);
     return json_decode($this->parseHttpResponse($output), TRUE);
   }
 
   /**
-   * Make an api call.
+   * Makes an asynchronous REST call.
+   *
+   * @param $url
+   * @param $params
+   * @param $method
+   * @param $api_key
+   * @return string
    */
-  private function post_async($url, $params, $method, $api_key) {
-    foreach ($params as $key => &$val) {
-      if (is_array($val)) $val = implode(',', $val);
-      $post_params[] = $key . '=' . urlencode($val);
+  private function post_async($url, $params, $method, $api_key, $post_json = FALSE) {
+    if (!$post_json) {
+      foreach ($params as $key => &$val) {
+        if (is_array($val)) $val = implode(',', $val);
+        $post_params[] = $key . '=' . urlencode($val);
+      }
+      $post_string = implode('&', $post_params);
     }
-    $post_string = implode('&', $post_params);
 
     $parts = parse_url($url);
 
@@ -152,14 +185,28 @@ class YottaaAPI {
             $errno, $errstr, 30);
 
     // Data goes in the path for a GET request
-    $parts['path'] .= '?' . $post_string;
+    if ($post_json) {
+      $parts['path'] .= '?' . $parts['query'];
+    } else {
+      $parts['path'] .= '?' . $post_string;
+    }
+
+    $post_data = $post_json ? json_encode($params) : "";
 
     $out = $method . " " . $parts['path'] . " HTTP/1.1\r\n";
     $out .= "Host: " . $parts['host'] . "\r\n";
     $out .= "Content-Type: application/x-www-form-urlencoded\r\n";
-    $out .= "Content-Length: 0\r\n";
+    $out .= "Content-Length: " . strlen($post_data) . "\r\n";
     $out .= "YOTTAA-API-KEY: " . $api_key . "\r\n";
     $out .= "Connection: Close\r\n\r\n";
+
+    if ($post_json) {
+      $out .= $post_data;
+    }
+
+    if ($this->getEnableLoggingParameter() == 1) {
+        $this->log($out);
+    }
 
     fwrite($fp, $out);
     $result = "";
@@ -205,7 +252,7 @@ class YottaaAPI {
   }
 
   /**
-   * Validate http responses by checking header.  Expects array of
+   * Validates http responses by checking header.  Expects array of
    * headers as argument.  Returns boolean.
    *
    * @param NULL $headers
@@ -227,7 +274,7 @@ class YottaaAPI {
   }
 
   /**
-   * Unchunk http content.  Returns unchunked content on success,
+   * Un-chunks http content.  Returns unchunked content on success,
    * FALSE on any errors...  Borrows from code posted above by
    * jbr at ya-right dot com.
    *
@@ -261,13 +308,30 @@ class YottaaAPI {
   }
 
   /**
-   * Post-process settings return from Yottaa service.
+   * Post-processes Yottaa site settings.
    *
    * @param $json_output
    * @return array
    */
   protected function postProcessingSettings($json_output) {
-      return array();
+    return array();
   }
 
+  /**
+   * Logs a message.
+   *
+   * @param $message
+   * @return void
+   */
+  public function log($message) {
+  }
+
+  /**
+   * Returns auto clear cache parameter.
+   *
+   * @return
+   */
+  public function getEnableLoggingParameter() {
+    return 0;
+  }
 }

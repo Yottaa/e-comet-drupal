@@ -466,6 +466,12 @@ function yottaa_auto_clear_cache_form($form, &$form_state) {
     '#default_value' => variable_get('reverse_proxy', 0)
   );
 
+  $form['yottaa_enable_logging'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable logging for Yottaa service calls.'),
+    '#default_value' => variable_get('yottaa_enable_logging', 0)
+  );
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#name' => 'clear',
@@ -483,10 +489,13 @@ function yottaa_auto_clear_cache_form_submit($form, &$form_state) {
   unset($form_state['storage']);
   variable_set('yottaa_auto_clear_cache', intval($form_state['values']['yottaa_auto_clear_cache']));
   variable_set('reverse_proxy', intval($form_state['values']['yottaa_enable_proxy_mode']));
+  variable_set('yottaa_enable_logging', intval($form_state['values']['yottaa_enable_logging']));
   $status = intval($form_state['values']['yottaa_auto_clear_cache']) == 1 ? 'enabled' : 'disabled';
   drupal_set_message(filter_xss(t('Automatically clearing Yottaa\'s site optimizer cache is ' . $status . '.')));
   $status = intval($form_state['values']['yottaa_enable_proxy_mode']) == 1 ? 'enabled' : 'disabled';
   drupal_set_message(filter_xss(t('Proxy mode is ' . $status . '.')));
+  $status = intval($form_state['values']['yottaa_enable_logging']) == 1 ? 'enabled' : 'disabled';
+  drupal_set_message(filter_xss(t('Logging for Yottaa service calls is ' . $status . '.')));
 }
 
 /*
@@ -549,10 +558,18 @@ function yottaa_comment_delete($comment) {
  * Takes an array from expire.module and issue purges.
  */
 function yottaa_expire_cache($paths) {
+  global $base_url;
   $yottaa_api = yottaa_api_drupal();
   $yottaa_auto_clear_cache = $yottaa_api->getAutoClearCacheParameter();
   if ($yottaa_auto_clear_cache == 1) {
-    $yottaa_api->flushPaths($paths);
+    $path_configs = array();
+    foreach ($paths as $path) {
+      $relative_path = str_replace($base_url,"",$path);
+      array_push($path_configs, array("condition" => $relative_path, "name" => "URI"));
+    }
+    $yottaa_api->log(json_encode($path_configs));
+    $results = $yottaa_api->flushPaths($path_configs);
+    $yottaa_api->log(json_encode($results));
   }
 }
 
