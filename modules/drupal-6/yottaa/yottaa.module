@@ -184,7 +184,7 @@ function yottaa_new_account_submit($form, &$form_state) {
     drupal_set_message(t('New account form has been created with preview url <a href="@preview_url">@preview_url</a>', array('@preview_url' => $preview_url)));
     drupal_set_message(t('Your Yottaa login information has been sent to your email address @user_email.', array('@user_email' => $user_email)));
 
-    $yottaa_api->updateParameters($json_output["api_key"],$json_output["user_id"],$json_output["site_id"]);
+    $yottaa_api->updateParameters($json_output["api_key"], $json_output["user_id"], $json_output["site_id"]);
 
     unset($form_state['storage']);
     menu_rebuild();
@@ -539,7 +539,7 @@ function yottaa_expire_cache($paths) {
   if ($yottaa_auto_clear_cache == 1) {
     $path_configs = array();
     foreach ($paths as $path) {
-      $relative_path = str_replace($base_url,"",$path);
+      $relative_path = str_replace($base_url, "", $path);
       array_push($path_configs, array("condition" => $relative_path, "name" => "URI"));
     }
     $yottaa_api->log(json_encode($path_configs));

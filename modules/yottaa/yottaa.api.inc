@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @file
  * Base Yottaa API Class for PHP based plugins.
  */
 
@@ -99,7 +100,7 @@ class YottaaAPI {
    * @param $sid
    * @return mixed
    */
-  public function getRuntimeStatus($key,$uid,$sid) {
+  public function getRuntimeStatus($key, $uid, $sid) {
     return $this->call('sites/' . $sid, array(
       'user_id' => $uid,
     ), 'GET', $key);
@@ -124,7 +125,7 @@ class YottaaAPI {
     $aggregated_return = array();
     foreach ($path_configs as $path_config) {
       $result = $this->call('sites/' . $this->sid . '/purge_cache?user_id=' . $this->uid . '&type=html', $path_config, 'POST', $this->key, TRUE);
-      array_push($aggregated_return, array("config"=> $path_config, "result" => $result));
+      array_push($aggregated_return, array("config" => $path_config, "result" => $result));
     }
     return $aggregated_return;
   }

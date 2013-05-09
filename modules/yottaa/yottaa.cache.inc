@@ -63,7 +63,7 @@ class YottaaCache implements DrupalCacheInterface {
           }
           else {
             $path = $cid . '(.*)';
-            $yottaa_api->flushPaths(array(array("condition"=>$path, "name"=>"URI", "operator" => "REGEX")));
+            $yottaa_api->flushPaths(array(array("condition" => $path, "name" => "URI", "operator" => "REGEX")));
           }
         }
         elseif (is_array($cid)) {

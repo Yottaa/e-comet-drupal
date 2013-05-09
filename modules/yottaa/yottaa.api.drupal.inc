@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @file
  * Yottaa Drupal API Class.
  */
 
@@ -197,7 +198,7 @@ class YottaaDrupalAPI extends YottaaAPI {
   public function log($message) {
     if ($this->getEnableLoggingParameter() == 1) {
       if (is_array($message) || is_object($message)) {
-        watchdog('yottaa', print_r($message, true));
+        watchdog('yottaa', print_r($message, TRUE));
       }
       else {
         watchdog('yottaa', $message);
