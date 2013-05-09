@@ -58,7 +58,8 @@ class YottaaAPI {
     if (is_array($name)) {
         $fname = isset($name['first_name']) ? $name['first_name'] : "";
         $lname = isset($name['last_name']) ? $name['last_name'] : "";
-    } else {
+    }
+    else {
         list($fname, $lname) = explode(" ", $name);
     }
 
@@ -187,7 +188,8 @@ class YottaaAPI {
     // Data goes in the path for a GET request
     if ($post_json) {
       $parts['path'] .= '?' . $parts['query'];
-    } else {
+    }
+    else {
       $parts['path'] .= '?' . $post_string;
     }
 

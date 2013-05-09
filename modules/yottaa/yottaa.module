@@ -15,7 +15,7 @@
  *
  */
 function yottaa_init() {
-  // Include Yottaa utility functions.
+  // Include Yottaa API classes.
   module_load_include('inc', 'yottaa', 'yottaa.api');
   module_load_include('inc', 'yottaa', 'yottaa.api.drupal');
 }
@@ -509,7 +509,7 @@ function yottaa_node_update($node) {
   if (!module_exists('expire')) {
     watchdog('yottaa', 'Caught node update event for node @node.', array('@node' => $node->nid), WATCHDOG_DEBUG);
     $yottaa_api = yottaa_api_drupal();
-    $yottaa_api->flushPaths($node);
+    $yottaa_api->flush();
   }
 }
 
@@ -522,7 +522,7 @@ function yottaa_comment_update($comment) {
     watchdog('yottaa', 'Caught comment update event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
     $node = node_load($comment->nid);
     $yottaa_api = yottaa_api_drupal();
-    $yottaa_api->flushPaths($node);
+    $yottaa_api->flush();
   }
 }
 
@@ -535,7 +535,7 @@ function yottaa_comment_insert($comment) {
     watchdog('yottaa', 'Caught comment insert event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
     $node = node_load($comment->nid);
     $yottaa_api = yottaa_api_drupal();
-    $yottaa_api->flushPaths($node);
+    $yottaa_api->flush();
   }
 }
 
@@ -548,7 +548,7 @@ function yottaa_comment_delete($comment) {
     watchdog('yottaa', 'Caught comment delete event for node @node.', array('@node' => $comment->nid), WATCHDOG_DEBUG);
     $node = node_load($comment->nid);
     $yottaa_api = yottaa_api_drupal();
-    $yottaa_api->flushPaths($node);
+    $yottaa_api->flush();
   }
 }
 
