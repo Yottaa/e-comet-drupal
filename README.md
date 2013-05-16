@@ -122,7 +122,7 @@ Whether you're already a Yottaa Site Optimizer user or want to try it for the fi
       and Request-Header whose name equals to "Cookie" and whose value contains "SESS"
       Then exclude this resource from optimization.
 
-[settings]: https://github.com/Yottaa/e-comet-drupal/raw/master/docs/images/2.png "Settings screen shot"
+[settings]: https://raw.github.com/Yottaa/e-comet-drupal/master/docs/images/2.png "Settings screen shot"
 
 ## Links ##
 
