@@ -91,6 +91,10 @@ Whether you're already a Yottaa Site Optimizer user or want to try it for the fi
 
    6. Return to the Drupal eComet plugin and confirm that the site is listed as "Live" and checklist items have changed to "Passed".  Here you can also make sure the box is checked for "Automatically clear Yottaa's Site Optimizer cache on node changes. (This will automatically send the most updated version of your site to Yottaa's CDN nodes, ensuring that your visitors have the fastest load times possible).
 
+![alt text][plugin]
+
+[plugin]: https://raw.github.com/Yottaa/e-comet-drupal/master/docs/images/1.png "Plugin screen shot"
+
 ## Yottaa Optimization Settings ##
 
 1. Enable Asset Caching with all default settings.
