@@ -51,6 +51,34 @@ Whether you're already a Yottaa Site Optimizer user or want to try it for the fi
     ```
     to update your remote Drupal installation.
 
+## Yottaa Optimization Settings ##
+
+1. Enable Asset Caching with all default settings.
+
+2. Enable HTML Caching with following settings
+
+   1. HTML Caching settings:
+
+      + Default caching behavior - follow HTTP cache control header when possible
+
+   2. Additional Settings:
+
+      + Enable home page caching rule.
+      + If request URL contains query string: Unique cache
+
+   3. Exceptions to HTML Caching:
+
+      + If URI contains "/edit"
+        Then exclude this resource from optimization.
+      + If URI contains "admin/"
+        Then exclude this resource from optimization.
+      + If URI contains "admin%252F"
+        Then exclude this resource from optimization.
+      + If URI matches RegExp "(.*)"
+        and Request-Header whose name equals to "Cookie" and whose value contains "SESS"
+        Then exclude this resource from optimization.
+
+
 ## Links ##
 
 * [Yottaa](http://www.yottaa.com)
