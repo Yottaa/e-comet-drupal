@@ -121,6 +121,7 @@ Whether you're already a Yottaa Site Optimizer user or want to try it for the fi
       If URI matches RegExp "(.*)"
       and Request-Header whose name equals to "Cookie" and whose value contains "SESS"
       Then exclude this resource from optimization.
+![alt text][settings]
 
 [settings]: https://raw.github.com/Yottaa/e-comet-drupal/master/docs/images/2.png "Settings screen shot"
 
