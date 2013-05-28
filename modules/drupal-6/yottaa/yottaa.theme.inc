@@ -36,9 +36,9 @@ function theme_yottaa_info($variables) {
       $contents .= 'Your site is currently in <span class="status-live">Live</span>.';
       $contents .= '</div>';
     }
-    elseif ($yottaa_status == 'paused') {
+    elseif ($yottaa_status == 'transparent proxy' || $yottaa_status == 'bypass') {
       $contents .= '<div>';
-      $contents .= 'Your site is currently in <span class="status-paused">Paused</span>.';
+      $contents .= 'Your site is currently in <span class="status-paused">Paused (' . $yottaa_status . ' mode)</span>.';
       $contents .= '</div>';
     }
   }
@@ -62,7 +62,7 @@ function theme_yottaa_info($variables) {
       $contents .= drupal_get_form('yottaa_optimizer_pause_form');
       $contents .= '<div>Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.</div>';
     }
-    elseif ($yottaa_status == 'paused') {
+    elseif ($yottaa_status == 'transparent proxy' || $yottaa_status == 'bypass') {
       $contents .= drupal_get_form('yottaa_optimizer_resume_form');
       $contents .= '<div>Starting optimization will apply optimizations on your website within 5minutes.</div>';
     }

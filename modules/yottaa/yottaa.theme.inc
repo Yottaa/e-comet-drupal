@@ -44,10 +44,10 @@ function theme_yottaa_info($variables) {
         '#markup' => '<div>Your site is currently in <span class="status-live">Live</span>.</div>'
       );
     }
-    elseif ($yottaa_status == 'paused') {
+    elseif ($yottaa_status == 'transparent proxy' || $yottaa_status == 'bypass') {
       $output['status'] = array(
         '#type' => 'markup',
-        '#markup' => '<div>Your site is currently in <span class="status-paused">Paused</span>.</div>'
+        '#markup' => '<div>Your site is currently in <span class="status-paused">Paused (' . $yottaa_status . ' mode)</span>.</div>'
       );
     }
   }
@@ -98,7 +98,7 @@ function theme_yottaa_info($variables) {
         '#markup' => drupal_render((drupal_get_form('yottaa_optimizer_pause_form')))
       );
     }
-    elseif ($yottaa_status == 'paused') {
+    elseif ($yottaa_status == 'transparent proxy' || $yottaa_status == 'bypass') {
       $output['action_a'] = array(
         '#type' => 'markup',
         '#markup' => drupal_render((drupal_get_form('yottaa_optimizer_resume_form')))
