@@ -40,6 +40,7 @@ class YottaaDrupalAPI extends YottaaAPI {
     variable_set($this->user_id_varname, $uid);
     variable_set($this->api_key_varname, $key);
     variable_set($this->site_id_varname, $sid);
+    parent::updateParameters($key, $uid, $sid);
   }
 
   /**
@@ -49,6 +50,7 @@ class YottaaDrupalAPI extends YottaaAPI {
     variable_del($this->user_id_varname);
     variable_del($this->api_key_varname);
     variable_del($this->site_id_varname);
+    parent::deleteParameters();
   }
 
   /**
