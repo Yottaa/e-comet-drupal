@@ -540,7 +540,7 @@ function yottaa_expire_cache($paths) {
     $path_configs = array();
     foreach ($paths as $path) {
       $relative_path = str_replace($base_url, "", $path);
-      array_push($path_configs, array("condition" => $relative_path, "name" => "URI"));
+      array_push($path_configs, array("condition" => $relative_path, "name" => "URI", "type" => "html"));
     }
     $yottaa_api->log(json_encode($path_configs));
     $results = $yottaa_api->flushPaths($path_configs);

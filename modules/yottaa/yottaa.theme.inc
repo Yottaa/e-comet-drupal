@@ -38,13 +38,13 @@ function theme_yottaa_info($variables) {
           . ' Before making your site live look over the links and configuration below.</div>'
       );
     }
-    elseif ($yottaa_status == 'live') {
+    elseif ($yottaa_api->isLive($yottaa_status)) {
       $output['status'] = array(
         '#type' => 'markup',
         '#markup' => '<div>Your site is currently in <span class="status-live">Live</span>.</div>'
       );
     }
-    elseif ($yottaa_status == 'transparent proxy' || $yottaa_status == 'bypass') {
+    elseif ($yottaa_api->isPaused($yottaa_status)) {
       $output['status'] = array(
         '#type' => 'markup',
         '#markup' => '<div>Your site is currently in <span class="status-paused">Paused (' . $yottaa_status . ' mode)</span>.</div>'
@@ -92,13 +92,13 @@ function theme_yottaa_info($variables) {
         '#markup' => drupal_render((drupal_get_form('yottaa_optimizer_activate_form')))
       );
     }
-    elseif ($yottaa_status == 'live') {
+    elseif ($yottaa_api->isLive($yottaa_status)) {
       $output['action_a'] = array(
         '#type' => 'markup',
         '#markup' => drupal_render((drupal_get_form('yottaa_optimizer_pause_form')))
       );
     }
-    elseif ($yottaa_status == 'transparent proxy' || $yottaa_status == 'bypass') {
+    elseif ($yottaa_api->isPaused($yottaa_status)) {
       $output['action_a'] = array(
         '#type' => 'markup',
         '#markup' => drupal_render((drupal_get_form('yottaa_optimizer_resume_form')))
@@ -218,7 +218,7 @@ function theme_yottaa_info($variables) {
 
     // Proxy mode
     $checklist_items_5 = '<div class="checklist-item"><span class="checklist-item-title">Enable drupal proxy mode</span>';
-    if (variable_get('reverse_proxy', 0) == 0 && $yottaa_status == 'live') {
+    if (variable_get('reverse_proxy', 0) == 0 && $yottaa_api->isLive($yottaa_status)) {
       $checklist_items_5 .= '<span class="checklist-item-status checklist-item-status-failed">Failed</span></div>';
       $checklist_items_5 .= '<div class="checklist-item"><span class="checklist-item-helper">Need to enable the proxy mode for drupal using the form in Settings section.<div>';
     }

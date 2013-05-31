@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ * Tests for yottaa.module.
+ */
+
+class YottaaAPITest extends DrupalUnitTestCase {
+
+  private $yottaa_api;
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Yottaa Module Unit Tests',
+      'description' => 'Unit tests for Yottaa module',
+      'group' => 'Yottaa',
+    );
+  }
+
+  function setUp() {
+    $this->yottaa_api = yottaa_api_drupal();
+
+    //Disable logging to watchdog
+    if ($this->yottaa_api->getEnableLoggingParameter() == 1) {
+      $this->yottaa_api->setEnableLoggingParameter(0);
+    }
+    parent::setUp('yottaa');
+  }
+
+  public function testYottaaAccount() {
+    $this->assertFalse($this->yottaa_api->isEmpty(),t('Module shouldn\'t have empty user id, site id or api key.'));
+
+    $json_result = $this->yottaa_api->getStatus();
+    $this->assertFalse(isset($json_result['error']), t('Yottaa account status call shouldn\'t return error.'));
+  }
+
+}

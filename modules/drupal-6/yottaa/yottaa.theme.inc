@@ -31,12 +31,12 @@ function theme_yottaa_info($variables) {
       $contents .= ' Before making your site live look over the links and configuration below.';
       $contents .= '</div>';
     }
-    elseif ($yottaa_status == 'live') {
+    elseif ($yottaa_api->isLive($yottaa_status)) {
       $contents .= '<div>';
       $contents .= 'Your site is currently in <span class="status-live">Live</span>.';
       $contents .= '</div>';
     }
-    elseif ($yottaa_status == 'transparent proxy' || $yottaa_status == 'bypass') {
+    elseif ($yottaa_api->isPaused($yottaa_status)) {
       $contents .= '<div>';
       $contents .= 'Your site is currently in <span class="status-paused">Paused (' . $yottaa_status . ' mode)</span>.';
       $contents .= '</div>';
@@ -58,11 +58,11 @@ function theme_yottaa_info($variables) {
       $contents .= drupal_get_form('yottaa_optimizer_activate_form');
       $contents .= '<div>Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.</div>';
     }
-    elseif ($yottaa_status == 'live') {
+    elseif ($yottaa_api->isLive($yottaa_status)) {
       $contents .= drupal_get_form('yottaa_optimizer_pause_form');
       $contents .= '<div>Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.</div>';
     }
-    elseif ($yottaa_status == 'transparent proxy' || $yottaa_status == 'bypass') {
+    elseif ($yottaa_api->isPaused($yottaa_status)) {
       $contents .= drupal_get_form('yottaa_optimizer_resume_form');
       $contents .= '<div>Starting optimization will apply optimizations on your website within 5minutes.</div>';
     }
@@ -126,7 +126,7 @@ function theme_yottaa_info($variables) {
 
     // Proxy mode
     $contents .= '<div class="checklist-item"><span class="checklist-item-title">Enable drupal proxy mode</span>';
-    if (variable_get('reverse_proxy', 0) == 0 && $yottaa_status == 'live') {
+    if (variable_get('reverse_proxy', 0) == 0 && $yottaa_api->isLive($yottaa_status)) {
       $contents .= '<span class="checklist-item-status checklist-item-status-failed">Failed</span></div>';
       $contents .= '<div class="checklist-item"><span class="checklist-item-helper">Need to enable the proxy mode for drupal using the form in Settings section.</span></div>';
     }

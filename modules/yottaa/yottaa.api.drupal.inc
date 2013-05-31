@@ -134,7 +134,7 @@ class YottaaDrupalAPI extends YottaaAPI {
                     if ($match["condition"] == $full_pages_key && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "REGEX") {
                       $only_cache_anonymous_users = $direction;
                     }
-                    if ($match["name"] == "Request-Header" && $match["header_name"] == "Cookie" && $match["condition"] == "SESS" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
+                    if ($match["name"] == "Cookie" && $match["condition"] == "SESS" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {
                       $excluded_sess_cookie = "set";
                     }
                     if ($match["condition"] == $edit_pages_key && $match["name"] == "URI" && $match["type"] == "0" && $match["operator"] == "CONTAIN") {

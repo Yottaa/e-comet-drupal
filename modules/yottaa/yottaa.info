@@ -7,3 +7,6 @@ configure = admin/config/system/yottaa
 files[] = yottaa.api.inc
 files[] = yottaa.api.drupal.inc
 files[] = yottaa.cache.inc
+files[] = yottaa.test
+
+dependencies[] = simpletest
