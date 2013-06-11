@@ -44,10 +44,16 @@ function theme_yottaa_info($variables) {
         '#markup' => '<div>Your site is currently in <span class="status-live">Live</span>.</div>'
       );
     }
-    elseif ($yottaa_api->isPaused($yottaa_status)) {
+    elseif ($yottaa_api->isBypass($yottaa_status)) {
       $output['status'] = array(
         '#type' => 'markup',
-        '#markup' => '<div>Your site is currently in <span class="status-paused">Paused (' . $yottaa_status . ' mode)</span>.</div>'
+        '#markup' => '<div>Your site is currently in <span class="status-paused">Bypass Mode</span>.</div>'
+      );
+    }
+    elseif ($yottaa_api->isTransparent($yottaa_status)) {
+      $output['status'] = array(
+        '#type' => 'markup',
+        '#markup' => '<div>Your site is currently in <span class="status-paused">Transparent Proxy Mode</span>.</div>'
       );
     }
   }
@@ -82,7 +88,7 @@ function theme_yottaa_info($variables) {
 
   $output['actions'] = array(
     '#type' => 'markup',
-    '#markup' => '<h3>Actions</h3>'
+    '#markup' => '<h3>Actions</h3><h5>Switch Optimizer Mode</h5>'
   );
 
   if (!isset($json_output["error"])) {
@@ -97,6 +103,10 @@ function theme_yottaa_info($variables) {
         '#type' => 'markup',
         '#markup' => drupal_render((drupal_get_form('yottaa_optimizer_pause_form')))
       );
+      $output['action_c'] = array(
+        '#type' => 'markup',
+        '#markup' => drupal_render((drupal_get_form('yottaa_optimizer_transparent_form')))
+      );
     }
     elseif ($yottaa_api->isPaused($yottaa_status)) {
       $output['action_a'] = array(
@@ -104,6 +114,10 @@ function theme_yottaa_info($variables) {
         '#markup' => drupal_render((drupal_get_form('yottaa_optimizer_resume_form')))
       );
     }
+    $output['actions_other'] = array(
+      '#type' => 'markup',
+      '#markup' => '<h5>Other Actions</h5>'
+    );
     $output['action_b'] = array(
       '#type' => 'markup',
       '#markup' => drupal_render((drupal_get_form('yottaa_clear_cache_form')))
@@ -248,13 +262,24 @@ function theme_yottaa_optimizer_activate_form($variables) {
 }
 
 /**
- * Custom theme for yottaa optimizer pause form.
+ * Custom theme for yottaa optimizer bypass form.
  *
  * @param $form
  */
 function theme_yottaa_optimizer_pause_form($variables) {
   $form = $variables['form'];
-  $rows = array(array(drupal_render($form['submit']), t('Activating your site allows all e-commerce visitors to receive the benefits out Yottaa\'s site speed optimizer.')));
+  $rows = array(array(drupal_render($form['submit']), t('In Bypass Mode, Yottaa DNS will route all traffic to your origin server directly, by-passing optimizations, SSL termination and origin server shielding etc. Your origin servers IP address are visible to anyone in this mode.')));
+  return theme('table', array('rows' => $rows)) . drupal_render_children($form);
+}
+
+/**
+ * Custom theme for yottaa optimizer transparent form.
+ *
+ * @param $form
+ */
+function theme_yottaa_optimizer_transparent_form($variables) {
+  $form = $variables['form'];
+  $rows = array(array(drupal_render($form['submit']), t('In Transparent Proxy Mode, Yottaa will proxy your site traffic through the Yottaa Network without applying any optimization. Other features such as SSL termination, site protection and Private Test are in effect as usual. Your origin servers IP address are shielded by Yottaa.')));
   return theme('table', array('rows' => $rows)) . drupal_render_children($form);
 }
 
@@ -265,7 +290,7 @@ function theme_yottaa_optimizer_pause_form($variables) {
  */
 function theme_yottaa_optimizer_resume_form($variables) {
   $form = $variables['form'];
-  $rows = array(array(drupal_render($form['submit']), t('Starting optimization will apply optimizations on your website within 5minutes.')));
+  $rows = array(array(drupal_render($form['submit']), t('Starting optimization will apply optimizations on your website within 5 minutes.')));
   return theme('table', array('rows' => $rows)) . drupal_render_children($form);
 }
 

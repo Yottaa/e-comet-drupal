@@ -302,6 +302,10 @@ function yottaa_theme($existing, $type, $theme, $path) {
       'file' => 'yottaa.theme.inc',
       'render element' => 'form',
     ),
+    'yottaa_optimizer_transparent_form' => array(
+      'file' => 'yottaa.theme.inc',
+      'render element' => 'form',
+    ),
     'yottaa_optimizer_resume_form' => array(
       'file' => 'yottaa.theme.inc',
       'render element' => 'form',
@@ -354,7 +358,7 @@ function yottaa_optimizer_pause_form($form, &$form_state) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#name' => 'activate',
-    '#value' => 'Pause Optimizations',
+    '#value' => 'Bypass',
   );
 
   return $form;
@@ -370,7 +374,41 @@ function yottaa_optimizer_pause_form_submit($form, &$form_state) {
   $json_output = $yottaa_api->pause();
 
   if (!isset($json_output["error"])) {
-    drupal_set_message(t('Your Yottaa optimizer has been paused.'));
+    drupal_set_message(t('Your Yottaa optimizer has been changed to bypass mode.'));
+    $form_state['redirect'] = 'admin/config/system/yottaa';
+  }
+  else {
+    $error = $json_output["error"];
+    form_set_error('', filter_xss('Error received from pausing Yottaa optimizer:' . json_encode($error)));
+  }
+
+}
+
+/**
+ * Implementation of hook_form().
+ *
+ */
+function yottaa_optimizer_transparent_form($form, &$form_state) {
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#name' => 'activate',
+    '#value' => 'Transparent Proxy',
+  );
+
+  return $form;
+}
+
+/**
+ * Implementation of hook_form_submit
+ *
+ */
+function yottaa_optimizer_transparent_form_submit($form, &$form_state) {
+  unset($form_state['storage']);
+  $yottaa_api = yottaa_api_drupal();
+  $json_output = $yottaa_api->transparent();
+
+  if (!isset($json_output["error"])) {
+    drupal_set_message(t('Your Yottaa optimizer has been changed to transparent proxy mode.'));
     $form_state['redirect'] = 'admin/config/system/yottaa';
   }
   else {

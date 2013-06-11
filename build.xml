@@ -86,12 +86,12 @@
                  username="${scp.drupal6.username}"
                  password="${scp.drupal6.password}"
                  trust="true"
-                 command="rm -r ${scp.drupal6.basepath}/*"
+                 command="rm -r ${scp.drupal6.basepath}/sites/all/modules/${yottaa.module.id}/*"
                  failonerror="false"/>
     </target>
 
     <target name="publish-drupal6" depends="unpublish-drupal6">
-        <scp todir="${scp.drupal6.username}@${scp.drupal6.host}:${scp.drupal6.basepath}"
+        <scp todir="${scp.drupal6.username}@${scp.drupal6.host}:${scp.drupal6.basepath}/sites/all/modules/${yottaa.module.id}"
              password="${scp.drupal6.password}"
              trust="true"
              verbose="true"
