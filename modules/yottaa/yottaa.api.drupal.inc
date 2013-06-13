@@ -111,9 +111,9 @@ class YottaaDrupalAPI extends YottaaAPI {
 
       if (isset($json_output["defaultActions"]) && isset($json_output["defaultActions"]["resourceActions"]) && isset($json_output["defaultActions"]["resourceActions"]["htmlCache"])) {
         $html_cachings = $json_output["defaultActions"]["resourceActions"]["htmlCache"];
-          foreach ($html_cachings as &$html_caching) {
-            if ($html_caching["enabled"]) {
-              $site_pages_caching = 'included';
+        foreach ($html_cachings as &$html_caching) {
+          if ($html_caching["enabled"]) {
+            $site_pages_caching = 'included';
           }
           if (isset($html_caching["filters"])) {
             $filters = $html_caching["filters"];
